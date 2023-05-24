@@ -2,8 +2,8 @@
 
 ActiveStorage's `variant` functionality is awesome, so why not have it for images in the Rails asset pipeline too?
 
-DerivedImages you to programmatically create image assets by applying transformations to other assets.
-Resize images, lower quality to save bytes, rotate and crop, convert between formats, and anything else that the
+Use DerivedImages to programmatically create image assets by applying transformations to other assets.
+Resize images, lower quality to save bytes, rotate, crop, convert between formats, and anything else that the
 [image_processing](https://rubygems.org/gems/image_processing) gem supports.
 
 ## Installation

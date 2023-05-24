@@ -7,8 +7,8 @@ Gem::Specification.new do |spec|
   spec.version     = DerivedImages::VERSION
   spec.authors     = ['Michael Kitson']
   spec.homepage    = 'https://github.com/michaelkitson/derived_images'
-  spec.summary     = 'Summary of DerivedImages.'
-  spec.description = 'Description of DerivedImages.'
+  spec.summary     = 'Programmatically create image assets by applying transformations to other assets.'
+  spec.description = 'Resize images, lower quality to save bytes, rotate, crop, convert between formats, and anything else that the image_processing gem supports.'
   spec.license     = 'MIT'
   spec.required_ruby_version = '>= 2.7.0'
 
