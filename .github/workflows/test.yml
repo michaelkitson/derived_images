@@ -1,4 +1,4 @@
-name: Test
+name: Tests
 on: push
 jobs:
   test:
@@ -19,7 +19,10 @@ jobs:
         if: ${{ startsWith(matrix.os, 'macos-') }}
         run: |
           brew update
-          brew install vips imagemagick
+          brew list --versions vips > /dev/null || brew install vips
+          brew list --versions imagemagick > /dev/null || brew install imagemagick
+        env:
+          HOMEBREW_NO_INSTALL_CLEANUP: 1
       - uses: actions/checkout@v3
       - uses: ruby/setup-ruby@v1
         with:
