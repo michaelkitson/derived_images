@@ -6,7 +6,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest]
         ruby: ['2.7', '3.2']
     runs-on: ${{ matrix.os }}
     steps:
@@ -15,4 +15,5 @@ jobs:
         with:
           ruby-version: ${{ matrix.ruby }}
           bundler-cache: true
+      - run: apt install -y libvips42 imagemagick
       - run: bundle exec rake test
