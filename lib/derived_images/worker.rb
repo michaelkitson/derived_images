@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module DerivedImages
+  # A Worker represents a thread in a thread pool that completes image creation tasks.
   class Worker
     def initialize(queue)
       @queue = queue

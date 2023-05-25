@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module DerivedImages
+  # The Railtie runs the {Processor} as part of a rails server.
   class Railtie < ::Rails::Railtie
     config.derived_images = ActiveSupport::OrderedOptions.new.update(
       build_path: 'app/assets/builds',

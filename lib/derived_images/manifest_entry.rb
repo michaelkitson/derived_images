@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module DerivedImages
+  # A ManifestEntry describes how to create one derived image.
   class ManifestEntry
     attr_accessor :source, :target, :chain
 

@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module DerivedImages
+  # The Manifest creates and holds a list of {ManifestEntry} instances, describing every derived image to create.
   class Manifest
     def initialize(path = Rails.root.join(DerivedImages.config.manifest_path))
       @path = path

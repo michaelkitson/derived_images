@@ -10,6 +10,7 @@ require 'derived_images/processor'
 require 'derived_images/railtie'
 require 'derived_images/worker'
 
+# DerivedImages programmatically creates derived image assets by applying transformations to other assets.
 module DerivedImages
   def self.config
     Rails.application.config.derived_images

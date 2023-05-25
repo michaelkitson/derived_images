@@ -10,7 +10,7 @@ Resize images, lower quality to save bytes, rotate, crop, convert between format
 
 1. Run `./bin/bundle add derived_images`
 2. Run `./bin/rails derived_images:install`
-3. Install Vips or ImageMagick (if not already installed for ActiveStorage)
+3. Install Vips or ImageMagick (if not already installed for ActiveStorage/ImageProcessing)
     - MacOS: `brew install vips` or `brew install imagemagick`
     - Debian/Ubuntu: `apt install libvips42` or `apt install imagemagick`
 

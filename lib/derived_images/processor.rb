@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 module DerivedImages
+  # The Processor manages a {Manifest}, watches the filesystem for changes, and manages a pool of {Worker} instances
+  # which perform the image tasks.
   class Processor
     def initialize
       @manifest = Manifest.new
