@@ -11,12 +11,12 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Install Vips and Imagemagick (linux)
-        if: ${{ startsWith(matrix.os, 'ubuntu-' }}
+        if: ${{ startsWith(matrix.os, 'ubuntu-') }}
         run: |
           sudo apt update
           sudo apt install -y libvips42 imagemagick
       - name: Install Vips and Imagemagick (macos)
-        if: ${{ startsWith(matrix.os, 'macos-' }}
+        if: ${{ startsWith(matrix.os, 'macos-') }}
         run: |
           brew update
           bre install vips imagemagick
