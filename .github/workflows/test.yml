@@ -19,7 +19,7 @@ jobs:
         if: ${{ startsWith(matrix.os, 'macos-') }}
         run: |
           brew update
-          bre install vips imagemagick
+          brew install vips imagemagick
       - uses: actions/checkout@v3
       - uses: ruby/setup-ruby@v1
         with:
