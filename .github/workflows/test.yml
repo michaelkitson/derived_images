@@ -22,7 +22,9 @@ jobs:
           brew list --versions vips > /dev/null || brew install vips
           brew list --versions imagemagick > /dev/null || brew install imagemagick
         env:
+          # Anything to make this a bit faster
           HOMEBREW_NO_INSTALL_CLEANUP: 1
+          HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: 1
       - uses: actions/checkout@v3
       - uses: ruby/setup-ruby@v1
         with:
