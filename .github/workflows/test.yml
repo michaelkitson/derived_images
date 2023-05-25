@@ -1,0 +1,33 @@
+name: Tests
+on: push
+jobs:
+  test:
+    name: Rake Test
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        ruby: ['2.7', '3.2']
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Install Vips and Imagemagick (linux)
+        if: ${{ startsWith(matrix.os, 'ubuntu-') }}
+        run: |
+          sudo apt update
+          sudo apt install -y libvips42 imagemagick
+      - name: Install Vips and Imagemagick (macos)
+        if: ${{ startsWith(matrix.os, 'macos-') }}
+        run: |
+          brew update
+          brew list --versions vips > /dev/null || brew install vips
+          brew list --versions imagemagick > /dev/null || brew install imagemagick
+        env:
+          # Anything to make this a bit faster
+          HOMEBREW_NO_INSTALL_CLEANUP: 1
+          HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: 1
+      - uses: actions/checkout@v3
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+          bundler-cache: true
+      - run: bundle exec rake test
