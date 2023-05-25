@@ -2,15 +2,24 @@ name: Test
 on: push
 jobs:
   test:
-    name: Test
+    name: Rake Test
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-latest, macos-latest]
         ruby: ['2.7', '3.2']
     runs-on: ${{ matrix.os }}
     steps:
-      - run: sudo apt install -y libvips42 imagemagick
+      - name: Install Vips and Imagemagick (linux)
+        if: ${{ startsWith(matrix.os, 'ubuntu-' }}
+        run: |
+          sudo apt update
+          sudo apt install -y libvips42 imagemagick
+      - name: Install Vips and Imagemagick (macos)
+        if: ${{ startsWith(matrix.os, 'macos-' }}
+        run: |
+          brew update
+          bre install vips imagemagick
       - uses: actions/checkout@v3
       - uses: ruby/setup-ruby@v1
         with:
