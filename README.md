@@ -10,6 +10,9 @@ Resize images, lower quality to save bytes, rotate, crop, convert between format
 
 1. Run `./bin/bundle add derived_images`
 2. Run `./bin/rails derived_images:install`
+3. Install Vips or ImageMagick (if not already installed for ActiveStorage)
+    - MacOS: `brew install vips` or `brew install imagemagick`
+    - Debian/Ubuntu: `apt install libvips42` or `apt install imagemagick`
 
 ## Usage
 
@@ -31,4 +34,5 @@ pipeline can pick them up with the normal asset helpers.
 ```
 
 ## License
+
 The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
