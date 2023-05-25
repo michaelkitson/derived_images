@@ -53,7 +53,7 @@ module DerivedImages
     end
 
     def process_all
-      manifest.each { enqueue(_1) }
+      manifest.each_value { enqueue(_1) }
     end
 
     def enqueue(entry)

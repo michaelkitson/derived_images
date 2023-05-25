@@ -15,9 +15,7 @@ class ManifestTest < ActiveSupport::TestCase
   attr_reader :manifest
 
   def test_draw_from_block
-    count = 0
-    manifest.each { count += 1 }
-    assert_equal 3, count
+    assert_equal 3, manifest.count
   end
 
   def test_draw_from_file
@@ -27,18 +25,19 @@ class ManifestTest < ActiveSupport::TestCase
       @manifest = DerivedImages::Manifest.new(file.path)
       manifest.draw
     end
-    count = 0
-    manifest.each { count += 1 }
-    assert_equal 3, count
+    assert_equal 3, manifest.count
   end
 
   def test_produced_from
-    assert_equal 2, manifest.produced_from(Pathname.new('app/assets/images/c.png').expand_path).length
+    entries = manifest.produced_from(Pathname.new('app/assets/images/c.png').expand_path)
+    assert_equal 2, entries.length
+    assert_equal 'c.png', entries[0].source
+    assert_equal 'c.png', entries[1].source
   end
 
   def test_resize
     manifest.draw { resize('a.png', 'b.png', 640, 480) }
-    entry = manifest.produced_from(Pathname.new('app/assets/images/b.png').expand_path).sole
+    entry = manifest['a.png']
     assert_equal 'a.png', entry.target
     assert_equal 'b.png', entry.source
     assert_equal([:resize_to_limit, [640, 480]], entry.chain.options[:operations].sole)
