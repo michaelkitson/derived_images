@@ -22,6 +22,14 @@ module DerivedImages
       Pathname.new(DerivedImages.config.build_path).join(target).expand_path
     end
 
+    # Returns a cache key for the result of the image transformation. It will vary if the source file's content varies
+    # or if the operations applied to generate the target vary.
+    #
+    # @return [String] A 64 character hexdigest
+    def cache_key
+      Digest::SHA256.hexdigest({ source: source_digest, pipeline: pipeline.options }.to_json)
+    end
+
     def self.empty_pipeline
       case type = DerivedImages.config.processor
       when :mini_magick
@@ -31,6 +39,12 @@ module DerivedImages
       else
         raise "Unknown derived_images processor type #{type}"
       end
+    end
+
+    private
+
+    def source_digest
+      Digest::SHA256.file(source_path).hexdigest
     end
   end
 end
