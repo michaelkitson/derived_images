@@ -40,12 +40,12 @@ class ManifestTest < ActiveSupport::TestCase
     entry = manifest['a.png']
     assert_equal 'a.png', entry.target
     assert_equal 'b.png', entry.source
-    assert_equal([:resize_to_limit, [640, 480]], entry.chain.options[:operations].sole)
+    assert_equal([:resize_to_limit, [640, 480]], entry.pipeline.options[:operations].sole)
   end
 
   def test_derive
-    chain = nil
-    manifest.draw { derive('a.png', 'b.png') { chain = _1 } }
-    assert_kind_of(ImageProcessing::Chainable, chain)
+    pipeline = nil
+    manifest.draw { derive('a.png', 'b.png') { pipeline = _1 } }
+    assert_kind_of(ImageProcessing::Chainable, pipeline)
   end
 end

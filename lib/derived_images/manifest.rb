@@ -3,6 +3,8 @@
 module DerivedImages
   # The Manifest creates and holds a list of {ManifestEntry} instances, describing every derived image to create.
   class Manifest
+    include Dsl
+
     def initialize(path = Rails.root.join(DerivedImages.config.manifest_path))
       @path = path
       @map = {}
@@ -29,31 +31,10 @@ module DerivedImages
       map.filter_map { |_target, entry| source_names.include?(entry.source) ? entry : nil }
     end
 
-    ### DSL Functions
-    def derive(target, source, &block)
-      map[target] = ManifestEntry.new(source, target, block ? yield(default_chain) : default_chain)
-    end
-
-    def resize(target, source, width, height)
-      derive(target, source) { _1.resize_to_limit(width, height) }
-    end
-    ### End DSL Functions
-
     attr_reader :path
 
     private
 
     attr_reader :map
-
-    def default_chain
-      case type = DerivedImages.config.processor
-      when :mini_magick
-        ImageProcessing::MiniMagick
-      when :vips
-        ImageProcessing::Vips
-      else
-        raise "Unknown derived_images processor type #{type}"
-      end
-    end
   end
 end

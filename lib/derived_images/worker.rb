@@ -22,7 +22,7 @@ module DerivedImages
 
     def process(entry)
       time = Benchmark.realtime do
-        entry.chain.loader(fail: true).call(entry.source_path.to_s, destination: entry.target_path.to_s)
+        entry.pipeline.loader(fail: true).call(entry.source_path.to_s, destination: entry.target_path.to_s)
       end
       DerivedImages.config.logger.debug("Created #{entry.target} from #{entry.source} in #{time.round(3)}s")
     end
