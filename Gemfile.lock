@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    derived_images (0.1.0)
+    derived_images (0.2.0)
       image_processing (~> 1.0)
       listen (~> 3.0)
       rails (>= 6.1)

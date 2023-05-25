@@ -6,9 +6,9 @@ class ManifestTest < ActiveSupport::TestCase
   def setup
     @manifest = DerivedImages::Manifest.new(nil)
     manifest.draw do
-      derive('a.png', 'c.png')
-      derive('b.png', 'c.png')
-      derive('1.png', '2.png')
+      derive('a.png', from: 'c.png')
+      derive('b.png', from: 'c.png')
+      derive('1.png', from: '2.png')
     end
   end
 
@@ -20,7 +20,7 @@ class ManifestTest < ActiveSupport::TestCase
 
   def test_draw_from_file
     Tempfile.create do |file|
-      file.write("derive 'a.png', 'c.png'\n derive 'b.png', 'c.png'\n derive '1.png', '2.png'")
+      file.write("derive 'a.png', from: 'c.png'\n derive 'b.png', from: 'c.png'\n derive '1.png', from: '2.png'")
       file.rewind
       @manifest = DerivedImages::Manifest.new(file.path)
       manifest.draw
@@ -36,7 +36,7 @@ class ManifestTest < ActiveSupport::TestCase
   end
 
   def test_resize
-    manifest.draw { resize('a.png', 'b.png', 640, 480) }
+    manifest.draw { resize('a.png', from: 'b.png', width: 640, height: 480) }
     entry = manifest['a.png']
     assert_equal 'a.png', entry.target
     assert_equal 'b.png', entry.source
@@ -45,7 +45,7 @@ class ManifestTest < ActiveSupport::TestCase
 
   def test_derive
     pipeline = nil
-    manifest.draw { derive('a.png', 'b.png') { pipeline = _1 } }
+    manifest.draw { derive('a.png', from: 'b.png') { pipeline = _1 } }
     assert_kind_of(ImageProcessing::Chainable, pipeline)
   end
 end

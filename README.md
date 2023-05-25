@@ -19,9 +19,9 @@ Resize images, lower quality to save bytes, rotate, crop, convert between format
 After installing, specify images to create in the config file at `config/derived_images.rb`.
 
 ```ruby
-derive 'my_derived_image.webp', 'my_source_image.jpg'
-resize 'tiny.png', 'original.png', 400, 300
-derive 'fully_custom.jpg', 'original.jpg' do |pipeline|
+derive 'my_derived_image.webp', from: 'my_source_image.jpg'
+resize 'tiny.png', from: 'original.png', width: 400, height: 300
+derive 'fully_custom.jpg', from: 'original.jpg' do |pipeline|
   pipeline.saver(quality: 50).resize_to_fill(80, 80).rotate(180)
 end
 ```
