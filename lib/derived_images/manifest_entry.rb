@@ -31,15 +31,10 @@ module DerivedImages
     end
 
     def self.empty_pipeline
-      case type = DerivedImages.config.processor
-      when :mini_magick
-        ImageProcessing::MiniMagick
-      when :vips
-        ImageProcessing::Vips
-      else
-        raise "Unknown derived_images processor type #{type}"
-      end
+      PROCESSORS.fetch(DerivedImages.config.processor).dup
     end
+
+    PROCESSORS = { mini_magick: ImageProcessing::MiniMagick, vips: ImageProcessing::Vips }.freeze
 
     private
 
