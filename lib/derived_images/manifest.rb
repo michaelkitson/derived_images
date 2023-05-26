@@ -37,6 +37,20 @@ module DerivedImages
 
     attr_reader :path
 
+    def diff_from(former_manifest)
+      changed = []
+      removed = []
+      former_manifest.each do |target, entry|
+        if key?(target)
+          changed << entry if map[target] != entry
+        else
+          removed << entry
+        end
+      end
+      added = map.filter_map { |target, entry| former_manifest.key?(target) ? nil : entry }
+      [added, changed, removed]
+    end
+
     private
 
     attr_reader :map
