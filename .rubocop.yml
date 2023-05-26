@@ -6,6 +6,7 @@ AllCops:
   TargetRubyVersion: 2.7
 
 Metrics/AbcSize:
+  Max: 20
   Exclude:
     - 'test/**/*'
 

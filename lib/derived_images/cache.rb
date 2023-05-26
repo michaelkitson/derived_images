@@ -79,6 +79,14 @@ module DerivedImages
       self
     end
 
+    # Get the SHA256 hash of a cached file.
+    #
+    # @param [String] key Cache key
+    # @return [String, nil] The hex-encoded digest
+    def digest(key)
+      Digest::SHA256.file(key_path(key)).hexdigest if exist?(key)
+    end
+
     private
 
     attr_reader :path
