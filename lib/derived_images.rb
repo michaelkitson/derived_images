@@ -3,6 +3,7 @@
 require 'image_processing'
 require 'listen'
 
+require 'derived_images/cache'
 require 'derived_images/dsl'
 require 'derived_images/manifest'
 require 'derived_images/manifest_entry'
