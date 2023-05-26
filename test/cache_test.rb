@@ -70,6 +70,17 @@ class CacheTest < MockEnvironmentTestCase
     assert_equal cache_key, cache.min
   end
 
+  test 'enumerable when disabled' do
+    cache = DerivedImages::Cache.new(nil)
+    assert_kind_of Enumerator, cache.each, '#each with no block returns an Enumerator'
+    assert_equal(cache, cache.each { _1 }, '#each with a block returns self')
+    assert_equal 0, cache.count
+    path = dir.join('sample').tap { _1.write('test') }
+    cache_key = '0' * 64
+    cache.take_and_store(cache_key, path)
+    assert_equal 0, cache.count
+  end
+
   attr_reader :cache
 
   def dir

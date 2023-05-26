@@ -73,7 +73,7 @@ module DerivedImages
     def each
       return enum_for(:each) unless block_given?
 
-      path.glob('*/*') { |path| yield path.to_s.last(65).delete('/') }
+      path.glob('*/*') { |path| yield path.to_s.last(65).delete('/') } if enabled?
       self
     end
 
