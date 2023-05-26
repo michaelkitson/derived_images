@@ -3,9 +3,9 @@
 module DerivedImages
   # A Worker represents a thread in a thread pool that completes image creation tasks.
   class Worker
-    def initialize(queue)
+    def initialize(queue, cache = Cache.new)
       @queue = queue
-      @cache = Cache.new
+      @cache = cache
     end
 
     def run
