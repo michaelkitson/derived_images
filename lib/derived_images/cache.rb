@@ -6,8 +6,10 @@ module DerivedImages
     include Enumerable
 
     # @param [Pathname, String] path The cache directory, which will be created if it does not exist.
-    def initialize(path = 'tmp/cache/derived_images')
+    # @param [Boolean] enabled If disabled, the cache will ignore every call
+    def initialize(path = 'tmp/cache/derived_images', enabled: DerivedImages.config.cache?)
       @path = Pathname.new(path)
+      @enabled = enabled
     end
 
     # Copy a cached file out to another path.
@@ -15,7 +17,7 @@ module DerivedImages
     # @param [String] key Cache key
     # @param [Pathname, String] path
     def copy(key, path)
-      FileUtils.copy(key_path(key), path)
+      enabled? && FileUtils.copy(key_path(key), path)
     end
 
     # Check for the presence of a cached file.
@@ -23,13 +25,15 @@ module DerivedImages
     # @param [String] key Cache key
     # @return [Boolean]
     def exist?(key)
-      key_path(key).file?
+      enabled? && key_path(key).file?
     end
 
     # Remove a cached file, if it exists.
     #
     # @param [String] key Cache key
     def remove(key)
+      return unless enabled?
+
       key_path(key).delete if key_path(key).exist?
       maybe_clean_dir_for(key)
     end
@@ -39,6 +43,8 @@ module DerivedImages
     # @param [String] key Cache key
     # @param [Pathname, String] path
     def store(key, path)
+      return unless enabled?
+
       mkdir_for(key)
       FileUtils.copy(path, key_path(key))
     end
@@ -48,6 +54,8 @@ module DerivedImages
     # @param [String] key Cache key
     # @param [Pathname, String] path
     def take_and_store(key, path)
+      return unless enabled?
+
       mkdir_for(key)
       FileUtils.mv(path, key_path(key))
     end
@@ -88,6 +96,10 @@ module DerivedImages
     def maybe_clean_dir_for(key)
       dir = key_path(key).dirname
       dir.rmdir if dir.directory? && dir.empty?
+    end
+
+    def enabled?
+      @enabled
     end
   end
 end
