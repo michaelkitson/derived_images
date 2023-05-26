@@ -5,7 +5,7 @@ require 'test_helper'
 class CacheTest < ActiveSupport::TestCase
   def setup
     @dir = Pathname.new(Dir.mktmpdir)
-    @cache = DerivedImages::Cache.new(@dir.to_s)
+    @cache = DerivedImages::Cache.new(@dir.to_s, enabled: true)
   end
 
   def teardown
