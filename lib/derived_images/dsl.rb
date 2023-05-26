@@ -23,9 +23,9 @@ module DerivedImages
     # @yieldparam pipeline [ImageProcessing::Chainable] The pipeline you can use to further customize the transformation
     # @return [ManifestEntry]
     def derive(target, from:, &block)
-      pipeline = ManifestEntry.empty_pipeline
-      pipeline = yield(pipeline) if block
-      add_entry(ManifestEntry.new(from, target, pipeline))
+      entry = ManifestEntry.new(from, target)
+      entry.pipeline = yield(entry.pipeline) if block
+      add_entry(entry)
     end
   end
 end

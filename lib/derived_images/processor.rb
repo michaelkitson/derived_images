@@ -25,6 +25,7 @@ module DerivedImages
     def run_once
       process_all
       queue.close
+      @workers.list.each(&:join)
     end
 
     private
