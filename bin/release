@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+VERSION=$1
+VERSION_FILE="./lib/derived_images/version.rb"
+BUILT_GEM="derived_images-$VERSION.gem"
+
+if [[ ! "$VERSION" =~ ^[0-9]{1,}\.[0-9]{1,}\.[0-9]{1,}$ ]]; then
+  echo "Usage: $0 <version>"
+  exit 1
+fi
+
+cat > $VERSION_FILE <<EOL
+# frozen_string_literal: true
+
+module DerivedImages
+  VERSION = '$VERSION'
+end
+EOL
+bundle
+git add Gemfile.lock $VERSION_FILE
+git commit -m "Bump version to $VERSION"
+git push
+git tag v$VERSION
+git push --tags
+gem build derived_images.gemspec
+gem push $BUILT_GEM
+rm $BUILT_GEM
