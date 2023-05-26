@@ -1,5 +1,5 @@
 # DerivedImages
-[![Gem Version](https://badge.fury.io/rb/derived_images.svg)](https://badge.fury.io/rb/derived_images)
+[![Gem Version](https://badge.fury.io/rb/derived_images.svg)](https://rubygems.org/gems/derived_images)
 
 ActiveStorage's `variant` functionality is awesome, so why not have it for images in the Rails asset pipeline too?
 
