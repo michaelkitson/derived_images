@@ -19,8 +19,7 @@ class WorkerTest < ActiveSupport::TestCase
   end
 
   test '#run with missing source file' do
-    queue << DerivedImages::ManifestEntry.new('non-existent-source.png', 'target.png',
-                                              DerivedImages::ManifestEntry.empty_pipeline)
+    queue << DerivedImages::ManifestEntry.new('non-existent-source.png', 'target.png')
     queue.close
     assert_nothing_raised do
       Timeout.timeout(0.1) { worker.run }

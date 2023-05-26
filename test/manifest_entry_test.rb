@@ -8,8 +8,7 @@ class ManifestEntryTest < ActiveSupport::TestCase
     @former_image_paths = DerivedImages.config.image_paths
     DerivedImages.config.image_paths = [File.dirname(@files[0].path)]
     @entries = @files.map do |file|
-      pipeline = DerivedImages::ManifestEntry.empty_pipeline
-      DerivedImages::ManifestEntry.new(File.basename(file.path), nil, pipeline)
+      DerivedImages::ManifestEntry.new(File.basename(file.path), 'target')
     end
   end
 

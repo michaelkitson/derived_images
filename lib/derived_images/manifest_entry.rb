@@ -5,9 +5,12 @@ module DerivedImages
   class ManifestEntry
     attr_accessor :source, :target, :pipeline
 
-    def initialize(source, target, pipeline)
+    def initialize(source, target)
       @source = source
       @target = target
+      target_ext = File.extname(target)
+      pipeline = PROCESSORS.fetch(DerivedImages.config.processor).dup
+      pipeline = pipeline.convert(target_ext) if target_ext.present?
       @pipeline = pipeline
     end
 
