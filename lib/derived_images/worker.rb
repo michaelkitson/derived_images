@@ -16,6 +16,7 @@ module DerivedImages
     end
 
     def self.start(thread_group, queue)
+      DerivedImages.config.logger.debug('Starting a new worker thread')
       thread_group.add(Thread.new { Worker.new(queue).run })
     end
 
@@ -24,6 +25,10 @@ module DerivedImages
     attr_reader :cache, :queue
 
     def process(entry)
+      unless entry.source_present?
+        return DerivedImages.config.logger.error("Can't find #{entry.source} to build #{entry.target}")
+      end
+
       cache_key = entry.cache_key
       if cache.exist?(cache_key)
         restore(entry, cache_key)
@@ -45,7 +50,7 @@ module DerivedImages
         FileUtils.mv(tempfile.path, entry.target_path)
       end
       cache.store(cache_key, entry.target_path)
-      DerivedImages.config.logger.debug("Created #{entry.target} from #{entry.source} in #{time.round(3)}s")
+      DerivedImages.config.logger.info("Created #{entry.target} from #{entry.source} in #{time.round(3)}s")
     end
   end
 end

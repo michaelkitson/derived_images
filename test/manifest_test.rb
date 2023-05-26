@@ -2,8 +2,9 @@
 
 require 'test_helper'
 
-class ManifestTest < ActiveSupport::TestCase
+class ManifestTest < MockEnvironmentTestCase
   def setup
+    super
     @manifest = DerivedImages::Manifest.new(nil)
     manifest.draw do
       derive('a.png', from: 'c.png')
@@ -29,7 +30,7 @@ class ManifestTest < ActiveSupport::TestCase
   end
 
   test '#produced_from' do
-    entries = manifest.produced_from(Pathname.new('app/assets/images/c.png').expand_path)
+    entries = manifest.produced_from(Pathname.new(DerivedImages.config.image_paths.first).join('c.png').expand_path)
     assert_equal 2, entries.length
     assert_equal 'c.png', entries[0].source
     assert_equal 'c.png', entries[1].source
