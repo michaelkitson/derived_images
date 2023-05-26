@@ -40,6 +40,10 @@ module DerivedImages
 
     PROCESSORS = { mini_magick: ImageProcessing::MiniMagick, vips: ImageProcessing::Vips }.freeze
 
+    def target_digest
+      Digest::SHA256.file(target_path).hexdigest
+    end
+
     private
 
     def source_digest
