@@ -7,11 +7,11 @@ module DerivedImages
 
     def initialize(path = Rails.root.join(DerivedImages.config.manifest_path))
       @path = path
-      @map = {}
+      @entry_map = {}
     end
 
     def draw(&block)
-      @map.clear
+      @entry_map.clear
       if block
         instance_eval(&block)
       else
@@ -20,10 +20,10 @@ module DerivedImages
     end
 
     def add_entry(entry)
-      map[entry.target] = entry
+      entry_map[entry.target] = entry
     end
 
-    delegate :[], :count, :each, :each_value, :key?, :length, to: :map
+    delegate :[], :count, :each, :each_value, :key?, :length, :transform_values, to: :entry_map
 
     def produced_from(source_path)
       source_names = []
@@ -32,7 +32,7 @@ module DerivedImages
         contains_source_file = source_path.ascend.any? { _1 == dir }
         source_names << source_path.relative_path_from(dir).to_s if contains_source_file
       end
-      map.filter_map { |_target, entry| source_names.include?(entry.source) ? entry : nil }
+      entry_map.filter_map { |_target, entry| source_names.include?(entry.source) ? entry : nil }
     end
 
     attr_reader :path
@@ -42,17 +42,17 @@ module DerivedImages
       removed = []
       former_manifest.each do |target, entry|
         if key?(target)
-          changed << entry if map[target] != entry
+          changed << entry if entry_map[target] != entry
         else
           removed << entry
         end
       end
-      added = map.filter_map { |target, entry| former_manifest.key?(target) ? nil : entry }
+      added = entry_map.filter_map { |target, entry| former_manifest.key?(target) ? nil : entry }
       [added, changed, removed]
     end
 
     private
 
-    attr_reader :map
+    attr_reader :entry_map
   end
 end
