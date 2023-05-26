@@ -7,19 +7,21 @@ class MockEnvironmentTestCase < ActiveSupport::TestCase
     build_dir = Dir.mktmpdir
     cache_dir = Dir.mktmpdir
     image_path = Dir.mktmpdir
-    manifest_path = Tempfile.new.path
-    @paths_to_remove = [build_dir, cache_dir, image_path, manifest_path]
+    config_dir = Dir.mktmpdir
+    @paths_to_remove = [build_dir, cache_dir, image_path, config_dir]
 
-    Rails.application.config.derived_images.update(
+    DerivedImages.config.update(
       build_path: build_dir,
       cache_path: cache_dir,
       enabled?: true,
       image_paths: [image_path],
-      manifest_path: manifest_path,
+      # logger: Logger.new($stdout),
+      manifest_path: File.join(config_dir, 'derived_images.rb'),
       threads: 0,
       watch?: false
     )
     super
+    # Listen.logger = DerivedImages.config.logger
   end
 
   def teardown

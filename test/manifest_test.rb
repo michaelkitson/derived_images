@@ -30,7 +30,7 @@ class ManifestTest < MockEnvironmentTestCase
   end
 
   test '#produced_from' do
-    entries = manifest.produced_from(Pathname.new(DerivedImages.config.image_paths.first).join('c.png').expand_path)
+    entries = manifest.produced_from(Pathname.new(DerivedImages.config.image_paths.first).realpath.join('c.png'))
     assert_equal 2, entries.length
     assert_equal 'c.png', entries[0].source
     assert_equal 'c.png', entries[1].source

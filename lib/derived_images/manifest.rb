@@ -23,12 +23,12 @@ module DerivedImages
       entry_map[entry.target] = entry
     end
 
-    delegate :[], :count, :each, :each_value, :key?, :length, :transform_values, to: :entry_map
+    delegate :[], :count, :each, :each_value, :filter_map, :key?, :length, to: :entry_map
 
     def produced_from(source_path)
       source_names = []
       DerivedImages.config.image_paths.each do |path|
-        dir = Pathname.new(path).expand_path
+        dir = Pathname.new(path).expand_path.realpath
         contains_source_file = source_path.ascend.any? { _1 == dir }
         source_names << source_path.relative_path_from(dir).to_s if contains_source_file
       end

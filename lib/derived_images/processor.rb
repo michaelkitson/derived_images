@@ -5,10 +5,10 @@ module DerivedImages
   # which perform the image tasks.
   class Processor
     def initialize
-      @manifest = Manifest.new
+      @cache = Cache.new
+      @manifest = Manifest.new.tap(&:draw)
       @queue = Thread::Queue.new
       @workers = ThreadGroup.new
-      manifest.draw
     end
 
     def watch
@@ -17,18 +17,25 @@ module DerivedImages
       process_all
     end
 
+    def unwatch
+      manifest_listener&.stop
+      image_listener&.stop
+    end
+
     def run_once
       process_all
-      @queue.close
+      queue.close
     end
 
     private
 
-    attr_reader :image_listener, :manifest, :manifest_listener
+    attr_reader :cache, :image_listener, :manifest, :manifest_listener, :queue, :workers
 
     def watch_manifest
-      @manifest_listener = Listen.to(manifest.path.dirname, only: Regexp.new(manifest.path.basename.to_s)) do
-        manifest.draw
+      dir, file = manifest.path.split.map(&:to_s)
+      @manifest_listener = Listen.to(dir, only: Regexp.new(file)) do
+        DerivedImages.config.logger.debug('Reloading changed manifest')
+        @manifest = Manifest.new.tap(&:draw)
         process_all
       end
       manifest_listener.start
@@ -36,30 +43,32 @@ module DerivedImages
 
     def watch_images
       @image_listener = Listen.to(*DerivedImages.config.image_paths) do |modified, added, removed|
-        (modified + added).each { handle_update(Pathname.new(_1).expand_path) }
-        removed.each { handle_removal(Pathname.new(_1).expand_path) }
+        (modified + added + removed).each do |path|
+          source_path = Pathname.new(path).expand_path.realpath
+          manifest.produced_from(source_path).each { enqueue(_1) }
+        end
+        prune_cache
       end
       image_listener.start
     end
 
-    def handle_update(source_path)
-      manifest.produced_from(source_path).each { enqueue(_1) }
-    end
-
-    def handle_removal(source_path)
-      return unless manifest.produced_from(source_path).empty?
-
-      raise "Invalid config (file not found) #{source_path}"
-    end
-
     def process_all
       manifest.each_value { enqueue(_1) }
+      prune_cache
     end
 
     def enqueue(entry)
-      should_expand = @queue.num_waiting.zero? && @workers.list.length < DerivedImages.config.threads
-      @queue << entry
-      Worker.start(@workers, @queue) if should_expand
+      should_expand = queue.num_waiting.zero? && workers.list.length < DerivedImages.config.threads
+      queue << entry
+      Worker.start(workers, queue) if should_expand
+    end
+
+    def prune_cache
+      expected_keys = manifest.filter_map { |_target, entry| entry.cache_key }
+      (cache.to_a - expected_keys).each do |key|
+        DerivedImages.config.logger.debug("Removing cached file at #{key}")
+        cache.remove(key)
+      end
     end
   end
 end
