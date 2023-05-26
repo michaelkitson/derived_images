@@ -20,6 +20,7 @@ module DerivedImages
         path = Pathname.new(path).join(source).expand_path
         return path if path.file?
       end
+      nil
     end
 
     def target_path
@@ -29,8 +30,10 @@ module DerivedImages
     # Returns a cache key for the result of the image transformation. It will vary if the source file's content varies
     # or if the operations applied to generate the target vary.
     #
-    # @return [String] A 64 character hexdigest
+    # @return [String, nil] A 64 character hexdigest, or nil if the source file can't be found
     def cache_key
+      return nil unless source_present?
+
       Digest::SHA256.hexdigest({ source: source_digest, pipeline: options_hash }.to_json)
     end
 
@@ -42,6 +45,10 @@ module DerivedImages
 
     def target_digest
       Digest::SHA256.file(target_path).hexdigest
+    end
+
+    def source_present?
+      source_path&.file?
     end
 
     private

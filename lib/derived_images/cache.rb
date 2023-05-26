@@ -5,11 +5,9 @@ module DerivedImages
   class Cache
     include Enumerable
 
-    # @param [Pathname, String] path The cache directory, which will be created if it does not exist.
-    # @param [Boolean] enabled If disabled, the cache will ignore every call
-    def initialize(path = 'tmp/cache/derived_images', enabled: DerivedImages.config.cache?)
-      @path = Pathname.new(path)
-      @enabled = enabled
+    # @param [Pathname, String, nil] path The cache directory, which will be created if missing. Nil disables caching.
+    def initialize(path = DerivedImages.config.cache_path)
+      @path = path && Pathname.new(path)
     end
 
     # Copy a cached file out to another path.
@@ -107,7 +105,7 @@ module DerivedImages
     end
 
     def enabled?
-      @enabled
+      !@path.nil?
     end
   end
 end
