@@ -5,6 +5,10 @@ AllCops:
   NewCops: enable
   TargetRubyVersion: 2.7
 
+Layout/LineLength:
+  Exclude:
+    - 'derived_images.gemspec'
+
 Metrics/AbcSize:
   Max: 20
   Exclude:
