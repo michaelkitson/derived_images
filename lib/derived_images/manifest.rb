@@ -19,7 +19,11 @@ module DerivedImages
       end
     end
 
-    delegate :[], :count, :each_value, :length, to: :map
+    def add_entry(entry)
+      map[entry.target] = entry
+    end
+
+    delegate :[], :count, :each, :each_value, :key?, :length, to: :map
 
     def produced_from(source_path)
       source_names = []

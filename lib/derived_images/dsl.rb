@@ -25,7 +25,7 @@ module DerivedImages
     def derive(target, from:, &block)
       pipeline = ManifestEntry.empty_pipeline
       pipeline = yield(pipeline) if block
-      map[target] = ManifestEntry.new(from, target, pipeline)
+      add_entry(ManifestEntry.new(from, target, pipeline))
     end
   end
 end
