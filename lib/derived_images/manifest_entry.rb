@@ -11,6 +11,10 @@ module DerivedImages
       @pipeline = pipeline
     end
 
+    def ==(other)
+      source == other.source && target == other.target && options_hash == other.options_hash
+    end
+
     def source_path
       DerivedImages.config.image_paths.each do |path|
         path = Pathname.new(path).join(source).expand_path
@@ -27,7 +31,7 @@ module DerivedImages
     #
     # @return [String] A 64 character hexdigest
     def cache_key
-      Digest::SHA256.hexdigest({ source: source_digest, pipeline: pipeline.options }.to_json)
+      Digest::SHA256.hexdigest({ source: source_digest, pipeline: options_hash }.to_json)
     end
 
     def self.empty_pipeline
@@ -40,6 +44,12 @@ module DerivedImages
 
     def source_digest
       Digest::SHA256.file(source_path).hexdigest
+    end
+
+    protected
+
+    def options_hash
+      pipeline.branch.options
     end
   end
 end
