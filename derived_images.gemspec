@@ -25,5 +25,5 @@ else that the image_processing gem supports.'
 
   spec.add_dependency 'image_processing', '~> 1.0'
   spec.add_dependency 'listen', '~> 3.0'
-  spec.add_dependency 'rails', '>= 6.1'
+  spec.add_dependency 'railties', '>= 6.1'
 end
