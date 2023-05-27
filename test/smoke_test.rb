@@ -5,7 +5,7 @@ require 'test_helper'
 class SmokeTest < MockEnvironmentTestCase
   def setup
     super
-    @formats = %i[jpg png webp avif]
+    @formats = %i[bmp gif jpg png webp avif]
     File.open(DerivedImages.config.manifest_path, 'w') do |f|
       formats.each { f.puts "derive 'test.#{_1}', from: 'sample.jpg'" }
     end
@@ -31,6 +31,8 @@ class SmokeTest < MockEnvironmentTestCase
 
   test 'implicitly converts files' do
     processor.run_once
+    assert_equal 'BM'.b, build_path.join('test.bmp').read(2), 'Outputs a bmp'
+    assert_equal 'GIF89a'.b, build_path.join('test.gif').read(6), 'Outputs a gif'
     assert_equal "\xff\xd8\xff".b, build_path.join('test.jpg').read(3), 'Outputs a jpg'
     assert_equal "\x89PNG".b, build_path.join('test.png').read(4), 'Outputs a png'
     assert_equal 'RIFF', build_path.join('test.webp').read(4), 'Outputs a webp'
