@@ -37,6 +37,7 @@ class ProcessorTest < MockEnvironmentTestCase
 
   test '#watch' do
     @processor.watch
+    sleep 0.5
     assert_equal 2, @queue.length, 'enqueues the jobs'
     assert_not @queue.closed?, 'leaves the queue open'
   end
@@ -48,7 +49,7 @@ class ProcessorTest < MockEnvironmentTestCase
     assert @queue.empty?
 
     File.open(DerivedImages.config.manifest_path, 'a', &:puts)
-    sleep 0.5
+    sleep 1
     assert_equal 2, @queue.length, 'enqueues the jobs'
   end
 
@@ -60,7 +61,7 @@ class ProcessorTest < MockEnvironmentTestCase
 
     image_path = Pathname.new(DerivedImages.config.image_paths.first).join('source1.png')
     File.open(image_path, 'w', &:puts)
-    sleep 0.5
+    sleep 1
     assert_equal 1, @queue.length, 'enqueues the jobs'
   end
 end
