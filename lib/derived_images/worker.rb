@@ -45,11 +45,13 @@ module DerivedImages
     end
 
     def generate(entry, cache_key)
+      target_path = entry.target_path
       time = Benchmark.realtime do
         tempfile = entry.pipeline.loader(fail: true).call(entry.source_path.to_s)
-        FileUtils.mv(tempfile.path, entry.target_path)
+        File.chmod(0o644, tempfile.path)
+        FileUtils.mv(tempfile.path, target_path)
       end
-      cache.store(cache_key, entry.target_path)
+      cache.store(cache_key, target_path)
       DerivedImages.config.logger.info("Created #{entry.target} from #{entry.source} in #{time.round(3)}s")
     end
   end

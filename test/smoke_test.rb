@@ -26,6 +26,7 @@ class SmokeTest < MockEnvironmentTestCase
     processor.run_once
     formats.each do |format|
       assert build_path.join("test.#{format}").file?
+      assert_equal '100644', format('%o', build_path.join("test.#{format}").stat.mode)
     end
   end
 
