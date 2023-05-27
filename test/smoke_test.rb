@@ -6,7 +6,7 @@ class SmokeTest < MockEnvironmentTestCase
   def setup
     super
     File.open(DerivedImages.config.manifest_path, 'w') do |f|
-      %i[jpg png webp].each { f.puts "derive 'test.#{_1}', from: 'sample.jpg'" }
+      %i[jpg png webp avif].each { f.puts "derive 'test.#{_1}', from: 'sample.jpg'" }
     end
     @processor = DerivedImages::Processor.new
     @build_path = Pathname.new(DerivedImages.config.build_path)
@@ -26,6 +26,7 @@ class SmokeTest < MockEnvironmentTestCase
     assert build_path.join('test.jpg').file?
     assert build_path.join('test.png').file?
     assert build_path.join('test.webp').file?
+    assert build_path.join('test.avif').file?
   end
 
   test 'implicitly converts files' do
@@ -33,5 +34,6 @@ class SmokeTest < MockEnvironmentTestCase
     assert_equal "\xff\xd8\xff".b, build_path.join('test.jpg').read(3), 'Outputs a jpg'
     assert_equal "\x89PNG".b, build_path.join('test.png').read(4), 'Outputs a png'
     assert_equal 'RIFF', build_path.join('test.webp').read(4), 'Outputs a webp'
+    assert_equal 'ftypavif', build_path.join('test.avif').read(12).last(8), 'Outputs an avif'
   end
 end
