@@ -5,8 +5,9 @@ require 'test_helper'
 class SmokeTest < MockEnvironmentTestCase
   def setup
     super
+    @formats = %i[jpg png webp avif]
     File.open(DerivedImages.config.manifest_path, 'w') do |f|
-      %i[jpg png webp avif].each { f.puts "derive 'test.#{_1}', from: 'sample.jpg'" }
+      formats.each { f.puts "derive 'test.#{_1}', from: 'sample.jpg'" }
     end
     @processor = DerivedImages::Processor.new
     @build_path = Pathname.new(DerivedImages.config.build_path)
@@ -19,14 +20,13 @@ class SmokeTest < MockEnvironmentTestCase
     super
   end
 
-  attr_reader :build_path, :processor
+  attr_reader :build_path, :formats, :processor
 
   test 'creates files' do
     processor.run_once
-    assert build_path.join('test.jpg').file?
-    assert build_path.join('test.png').file?
-    assert build_path.join('test.webp').file?
-    assert build_path.join('test.avif').file?
+    formats.each do |format|
+      assert build_path.join("test.#{format}").file?
+    end
   end
 
   test 'implicitly converts files' do
