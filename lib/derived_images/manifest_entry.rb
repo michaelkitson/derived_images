@@ -34,7 +34,9 @@ module DerivedImages
     def cache_key
       return nil unless source_present?
 
-      Digest::SHA256.hexdigest({ source: source_digest, pipeline: options_hash }.to_json)
+      Digest::SHA256.hexdigest({ version: DerivedImages::VERSION,
+                                 source: source_digest,
+                                 pipeline: options_hash }.to_json)
     end
 
     def self.empty_pipeline

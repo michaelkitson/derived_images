@@ -33,7 +33,6 @@ class ManifestEntryTest < ActiveSupport::TestCase
   end
 
   test '#cache_key' do
-    assert_equal 'd98176764f9aadf95294b4fe84158e61586dd12c67f580d3651ae592d5da1c3a', @entries[0].cache_key
     assert_not_equal @entries[0].cache_key, @entries[1].cache_key
     assert_equal @entries[0].cache_key, @entries[2].cache_key
     @entries[2].pipeline = @entries[2].pipeline.resize_to_limit(1, 1)
@@ -41,8 +40,9 @@ class ManifestEntryTest < ActiveSupport::TestCase
   end
 
   test '#cache_key manually constructed' do
-    source = Digest::SHA256.hexdigest('test1')
-    expected = Digest::SHA256.hexdigest({ source: source, pipeline: empty_pipeline_options }.to_json)
+    expected = Digest::SHA256.hexdigest({ version: DerivedImages::VERSION,
+                                          source: Digest::SHA256.hexdigest('test1'),
+                                          pipeline: empty_pipeline_options }.to_json)
     assert_equal expected, @entries[0].cache_key
   end
 
