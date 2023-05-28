@@ -8,7 +8,7 @@ module DerivedImages
     def initialize(source, target)
       @source = source
       @target = target
-      @pipeline = default_pipeline(File.extname(target))
+      @pipeline = default_pipeline(File.extname(target).delete_prefix('.'))
     end
 
     def ==(other)
