@@ -39,3 +39,5 @@ jobs:
 
       - name: Run tests
         run: bundle exec rake test
+        env:
+          SEED: 14993
