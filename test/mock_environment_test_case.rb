@@ -3,7 +3,7 @@
 require 'test_helper'
 
 class MockEnvironmentTestCase < ActiveSupport::TestCase
-  def setup
+  def setup # rubocop:disable Metrics/MethodLength
     build_dir = Dir.mktmpdir
     cache_dir = Dir.mktmpdir
     image_path = Dir.mktmpdir
