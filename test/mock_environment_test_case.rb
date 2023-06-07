@@ -17,6 +17,7 @@ class MockEnvironmentTestCase < ActiveSupport::TestCase
       image_paths: [image_path],
       # logger: Logger.new($stdout),
       manifest_path: File.join(config_dir, 'derived_images.rb'),
+      processor: :vips,
       threads: 0,
       watch?: false
     )
