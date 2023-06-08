@@ -4,7 +4,7 @@
 require 'bundler/setup'
 require 'mini_magick'
 
-output, _, _ = MiniMagick::Shell.new.execute(%w[identify -list format])
+output, = MiniMagick::Shell.new.execute(%w[identify -list format])
 lines = output.partition("\n\n").first.lines[2..]
 formats = lines.reject { _1.start_with?(' ' * 10) } # Remove continuation lines
                .map { _1.strip.split(/\s+/, 4) } # "Format Module Mode Description"

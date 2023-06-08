@@ -13,7 +13,7 @@ jobs:
       - name: Install Vips and Imagemagick (linux)
         if: ${{ startsWith(matrix.os, 'ubuntu-') }}
         run: |
-          sudo apt update
+          sudo apt update -qq
           sudo apt install -yqq libvips42 imagemagick
 
       - name: Install Vips and Imagemagick (macos)
