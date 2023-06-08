@@ -14,7 +14,7 @@ jobs:
         if: ${{ startsWith(matrix.os, 'ubuntu-') }}
         run: |
           sudo apt update
-          sudo apt install -y libvips42 imagemagick
+          sudo apt install -yqq libvips42 imagemagick
 
       - name: Install Vips and Imagemagick (macos)
         if: ${{ startsWith(matrix.os, 'macos-') }}
@@ -36,6 +36,9 @@ jobs:
 
       - name: Lint Ruby
         run: bundle exec rubocop
+
+      - name: Print platform information
+        run: ./bin/vips_info; echo; ./bin/magick_info
 
       - name: Run tests
         run: bundle exec rake test
