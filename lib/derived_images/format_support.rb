@@ -32,7 +32,7 @@ module DerivedImages
         table << ['AVIF', instance.avif?]
         table << ['HEIC', instance.heic?]
         table << ['JPEG 2000', instance.jpeg_2000?]
-        table << ['JPEG XL', instance.jepg_xl?]
+        table << ['JPEG XL', instance.jpeg_xl?]
       end
     end
 
