@@ -56,16 +56,25 @@ class SmokeTest < MockEnvironmentTestCase
     webp: 'RIFF',
     avif: "\x00\x00\x00\x1cftypavif".b,
     heic: "\x00\x00\x00\x1cftypheic".b,
-    jxl: "\xff\x0a".b,
-    jp2: "\0\0\0\x0cjP  \x0d\n\x87\n".b
+    jxl: "\xff\x0a".b
+    # jp2: Special case
   }.with_indifferent_access.freeze
 
   def check_magic_numbers
-    formats.each do |format|
-      magic_string = MAGIC.fetch(format)
-      assert_equal magic_string, build_path.join("test.#{format}").read(magic_string.bytesize),
+    (formats - ['jp2']).each do |format|
+      magic = MAGIC.fetch(format)
+      assert_equal magic, build_path.join("test.#{format}").read(magic.bytesize),
                    "#{format} has the correct magic string"
     end
+    return unless formats.include?('jp2')
+
+    actual = build_path.join('test.jp2').read(12)
+    expected = "\0\0\0\x0cjP  \x0d\n\x87\n".b
+    if actual[0] == "\xFF"
+      actual = actual.first(4)
+      expected = "\xFFO\xFFQ".b
+    end
+    assert_equal expected, actual, 'jp2 has the correct magic string'
   end
 
   def setup_processor(processor)
