@@ -7,5 +7,6 @@ require 'derived_images'
 table = DerivedImages::FormatSupport.table(:vips)
 width = table.map { |k, _v| k.length }.max + 1
 
-puts 'VIPS Image Format Support:'
+puts "VIPS Version: #{Vips.version_string}"
+puts 'Supported Formats:'
 table.each { |name, supported| puts "#{"#{name}:".ljust(width, ' ')} #{supported ? '✅' : '❌'}" }
