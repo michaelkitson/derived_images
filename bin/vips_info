@@ -2,32 +2,10 @@
 # frozen_string_literal: true
 
 require 'bundler/setup'
-require 'vips'
+require 'derived_images'
 
-ignored = %w[.csv .mat .raw .v .vips .hdr .dz .szi .fits .fit .fts .pbm .pgm .ppm .pfm .pnm]
-assumed = {
-  'BMP' => %w[.bmp],
-  'GIF' => %w[.gif],
-  'JPEG' => %w[.jpg .jpeg .jpe],
-  'PNG' => %w[.png],
-  'TIFF' => %w[.tif .tiff],
-  'WebP' => %w[.webp]
-}
-tested = {
-  'AVIF' => %w[.avif],
-  'HEIC' => %w[.heic .heif],
-  'JPEG 2000' => %w[.j2k .jp2 .jpt .j2c .jpc],
-  'JPEG XL' => %w[.jxl]
-}
-
-supported_extensions = Vips.get_suffixes
-unknown = supported_extensions - ignored - assumed.values.flatten - tested.values.flatten
+table = DerivedImages::FormatSupport.table(:vips)
+width = table.map { |k, _v| k.length }.max + 1
 
 puts 'VIPS Image Format Support:'
-width = unknown.empty? ? 10 : 14
-assumed.each { |name, _| puts "#{"#{name}:".ljust(width, ' ')} ✅" }
-tested.each do |name, extensions|
-  supported = supported_extensions.intersect?(extensions)
-  puts "#{"#{name}:".ljust(width, ' ')} #{supported ? '✅' : '❌'}"
-end
-puts "Other/Unknown: #{unknown.join(' ')}" unless unknown.empty?
+table.each { |name, supported| puts "#{"#{name}:".ljust(width, ' ')} #{supported ? '✅' : '❌'}" }

@@ -2,9 +2,11 @@
 
 require 'image_processing'
 require 'listen'
+require 'rails'
 
 require 'derived_images/cache'
 require 'derived_images/dsl'
+require 'derived_images/format_support'
 require 'derived_images/manifest'
 require 'derived_images/manifest_entry'
 require 'derived_images/processor'

@@ -2,28 +2,10 @@
 # frozen_string_literal: true
 
 require 'bundler/setup'
-require 'mini_magick'
+require 'derived_images'
 
-output, = MiniMagick::Shell.new.execute(%w[identify -list format])
-lines = output.partition("\n\n").first.lines[2..]
-formats = lines.reject { _1.start_with?(' ' * 10) } # Remove continuation lines
-               .map { _1.strip.split(/\s+/, 4) } # "Format Module Mode Description"
-               .select { |_format, _, mode, _| mode.start_with?('rw') } # Read and write supported
-               .map(&:first)
-               .map { _1.delete('*') }
-
-assumed = %w[BMP GIF JPEG PNG TIFF WebP]
-tested = {
-  'AVIF' => 'AVIF',
-  'HEIC' => 'HEIC',
-  'JPEG 2000' => 'JP2',
-  'JPEG XL' => 'JXL'
-}
+table = DerivedImages::FormatSupport.table(:mini_magick)
+width = table.map { |k, _v| k.length }.max + 1
 
 puts 'ImageMagick Image Format Support:'
-width = 10
-assumed.each { |name| puts "#{"#{name}:".ljust(width, ' ')} ✅" }
-tested.each do |name, magick_key|
-  supported = formats.include?(magick_key)
-  puts "#{"#{name}:".ljust(width, ' ')} #{supported ? '✅' : '❌'}"
-end
+table.each { |name, supported| puts "#{"#{name}:".ljust(width, ' ')} #{supported ? '✅' : '❌'}" }
