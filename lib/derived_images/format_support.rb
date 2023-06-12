@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module DerivedImages
+  # A helper class to test for library support for different image formats.
   class FormatSupport
     KNOWN_FORMATS = %w[bmp gif jpg png webp avif heic jp2 jxl].freeze
 

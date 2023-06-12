@@ -62,7 +62,8 @@ class SmokeTest < MockEnvironmentTestCase
 
   def check_magic_numbers
     MAGIC.each do |format, magic_string|
-      assert_equal magic_string, build_path.join("test.#{format}").read(magic_string.bytesize), "#{format} has the correct magic string"
+      assert_equal magic_string, build_path.join("test.#{format}").read(magic_string.bytesize),
+                   "#{format} has the correct magic string"
     end
   end
 
