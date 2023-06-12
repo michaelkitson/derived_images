@@ -58,10 +58,11 @@ class SmokeTest < MockEnvironmentTestCase
     heic: "\x00\x00\x00\x1cftypheic".b,
     jxl: "\xff\x0a".b,
     jp2: "\0\0\0\x0cjP  \x0d\n\x87\n".b
-  }.freeze
+  }.with_indifferent_access.freeze
 
   def check_magic_numbers
-    MAGIC.each do |format, magic_string|
+    formats.each do |format|
+      magic_string = MAGIC.fetch(format)
       assert_equal magic_string, build_path.join("test.#{format}").read(magic_string.bytesize),
                    "#{format} has the correct magic string"
     end
