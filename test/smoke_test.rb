@@ -70,7 +70,7 @@ class SmokeTest < MockEnvironmentTestCase
 
     actual = build_path.join('test.jp2').read(12)
     expected = "\0\0\0\x0cjP  \x0d\n\x87\n".b
-    if actual[0] == "\xFF"
+    if actual[0] != "\0"
       actual = actual.first(4)
       expected = "\xFFO\xFFQ".b
     end
