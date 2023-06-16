@@ -47,7 +47,7 @@ module DerivedImages
     def generate(entry, cache_key)
       target_path = entry.target_path
       time = Benchmark.realtime do
-        tempfile = entry.pipeline.loader(fail: true).call(entry.source_path.to_s)
+        tempfile = entry.pipeline.call(entry.source_path.to_s)
         File.chmod(0o644, tempfile.path)
         FileUtils.mv(tempfile.path, target_path)
       end

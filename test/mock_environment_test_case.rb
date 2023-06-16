@@ -3,7 +3,7 @@
 require 'test_helper'
 
 class MockEnvironmentTestCase < ActiveSupport::TestCase
-  def setup
+  def setup # rubocop:disable Metrics/MethodLength
     build_dir = Dir.mktmpdir
     cache_dir = Dir.mktmpdir
     image_path = Dir.mktmpdir
@@ -17,6 +17,7 @@ class MockEnvironmentTestCase < ActiveSupport::TestCase
       image_paths: [image_path],
       # logger: Logger.new($stdout),
       manifest_path: File.join(config_dir, 'derived_images.rb'),
+      processor: :vips,
       threads: 0,
       watch?: false
     )

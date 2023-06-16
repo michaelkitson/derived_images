@@ -1,0 +1,12 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'bundler/setup'
+require 'derived_images'
+
+table = DerivedImages::FormatSupport.table(:mini_magick)
+width = table.map { |k, _v| k.length }.max + 1
+
+puts "MiniMagick CLI Version: #{MiniMagick.cli}@#{MiniMagick.cli_version}"
+puts 'Supported Formats:'
+table.each { |name, supported| puts "#{"#{name}:".ljust(width, ' ')} #{supported ? '✅' : '❌'}" }
