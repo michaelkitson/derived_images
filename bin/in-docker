@@ -30,4 +30,6 @@ docker build --quiet --build-arg "RUBY_VERSION=${ruby_version}" --tag "$image" .
 
 tty=()
 [[ -t 0 && -t 1 ]] && tty=(-it)
-docker run --rm ${tty[@]+"${tty[@]}"} "$image" "bin/${binstub}" "$@"
+# SYS_NICE lets Docker's default seccomp profile allow set_mempolicy, which
+# libvips/ImageMagick's worker threads call; otherwise it logs a warning per thread.
+docker run --rm --cap-add=SYS_NICE ${tty[@]+"${tty[@]}"} "$image" "bin/${binstub}" "$@"
