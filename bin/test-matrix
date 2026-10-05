@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
-# Runs the test suite in Docker against supported Ruby/Rails pairs: bin/test-matrix [test args]
+# Runs the test suite in Docker against supported Ruby/Rails pairs: [JOBS=n] bin/test-matrix [test args]
 # Not a full cross product: Rails only supports a window of Rubies, so this lists the pairs worth running.
 # An empty Rails version means the newest Rails that installs on that Ruby.
+# JOBS (default 1) is how many pairs run at once. With JOBS=1 output streams live; with more, each
+# pair's output is buffered and the logs of failures are printed at the end.
 set -uo pipefail
 cd "$(dirname "$0")/.."
 
@@ -17,14 +19,53 @@ pairs=(
   "3.4|"
   "4.0|"
 )
-failed=()
+jobs="${JOBS:-1}"
+if ! [[ "$jobs" =~ ^[1-9][0-9]*$ ]]; then
+  echo "JOBS must be a positive integer (got '$jobs')" >&2
+  exit 1
+fi
 
+workdir="$(mktemp -d)"
+trap 'rm -rf "$workdir"' EXIT
+
+# Runs one pair; writes "<label>" to $workdir/<n>.failed on failure.
+run_pair() {
+  local n="$1" ruby="$2" rails="$3" label="Ruby $2 / Rails ${3:-latest}"
+  shift 3
+  if ((jobs == 1)); then
+    echo "=== $label ==="
+    RUBY_VERSION=$ruby RAILS_VERSION=$rails bin/in-docker test "$@" || echo "$label" > "$workdir/$n.failed"
+  else
+    if RUBY_VERSION=$ruby RAILS_VERSION=$rails bin/in-docker test "$@" > "$workdir/$n.log" 2>&1; then
+      echo "PASS: $label"
+    else
+      echo "FAIL: $label"
+      echo "$label" > "$workdir/$n.failed"
+    fi
+  fi
+}
+
+n=0
 for pair in "${pairs[@]}"; do
-  ruby="${pair%%|*}"
-  rails="${pair#*|}"
-  label="Ruby $ruby / Rails ${rails:-latest}"
-  echo "=== $label ==="
-  RUBY_VERSION=$ruby RAILS_VERSION=$rails bin/in-docker test "$@" || failed+=("$label")
+  n=$((n + 1))
+  while (($(jobs -rp | wc -l) >= jobs)); do sleep 1; done
+  if ((jobs == 1)); then
+    run_pair "$n" "${pair%%|*}" "${pair#*|}" "$@"
+  else
+    run_pair "$n" "${pair%%|*}" "${pair#*|}" "$@" &
+  fi
+done
+wait
+
+failed=()
+for n in $(seq 1 ${#pairs[@]}); do
+  [[ -f "$workdir/$n.failed" ]] || continue
+  label="$(cat "$workdir/$n.failed")"
+  failed+=("$label")
+  if ((jobs > 1)); then
+    echo "=== $label (output) ===" >&2
+    cat "$workdir/$n.log" >&2
+  fi
 done
 
 if ((${#failed[@]})); then
