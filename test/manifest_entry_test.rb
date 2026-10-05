@@ -2,8 +2,9 @@
 
 require 'test_helper'
 
-class ManifestEntryTest < ActiveSupport::TestCase
+class ManifestEntryTest < MockEnvironmentTestCase
   def setup
+    super
     @files = [sample_file('test1'), sample_file('test2'), sample_file('test1')]
     @former_image_paths = DerivedImages.config.image_paths
     DerivedImages.config.image_paths = [File.dirname(@files[0].path)]
@@ -18,6 +19,7 @@ class ManifestEntryTest < ActiveSupport::TestCase
       file.unlink
     end
     DerivedImages.config.image_paths = @former_image_paths
+    super
   end
 
   test '#==' do
