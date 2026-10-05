@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+# Runs a binstub inside a clean Linux container: bin/in-docker <binstub> [args]
+#   bin/in-docker test
+#   bin/in-docker test test/smoke_test.rb
+#   bin/in-docker vips_info
+#   RUBY_VERSION=2.7 bin/in-docker test
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+unsupported=(in-docker release)
+
+available=()
+for path in bin/*; do
+  name="$(basename "$path")"
+  [[ " ${unsupported[*]} " == *" $name "* ]] || available+=("$name")
+done
+
+binstub="${1:-}"
+if [[ -z "$binstub" || " ${available[*]} " != *" $binstub "* ]]; then
+  echo "Usage: bin/in-docker <binstub> [args]" >&2
+  echo "Available binstubs: ${available[*]}" >&2
+  exit 1
+fi
+shift
+
+ruby_version="${RUBY_VERSION:-4.0}"
+image="derived_images:${ruby_version}"
+
+docker build --quiet --build-arg "RUBY_VERSION=${ruby_version}" --tag "$image" . > /dev/null
+
+tty=()
+[[ -t 0 && -t 1 ]] && tty=(-it)
+docker run --rm ${tty[@]+"${tty[@]}"} "$image" "bin/${binstub}" "$@"

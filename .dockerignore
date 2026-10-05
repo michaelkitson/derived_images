@@ -1,0 +1,12 @@
+.git
+.bundle
+.idea
+Gemfile.lock
+log
+tmp
+pkg
+doc
+test/dummy/db/*.sqlite3*
+test/dummy/log
+test/dummy/storage
+test/dummy/tmp
