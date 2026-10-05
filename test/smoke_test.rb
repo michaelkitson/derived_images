@@ -55,7 +55,7 @@ class SmokeTest < MockEnvironmentTestCase
     png: "\x89PNG".b,
     webp: 'RIFF',
     avif: "\x00\x00\x00\x1cftypavif".b,
-    heic: "\x00\x00\x00\x1cftypheic".b,
+    heic: "\x00\x00\x00\x1cftypheic".b
     # jp2, jxl: Special cases
   }.with_indifferent_access.freeze
 

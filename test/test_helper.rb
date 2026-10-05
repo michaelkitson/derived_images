@@ -14,4 +14,4 @@ if ActiveSupport::TestCase.respond_to?(:fixture_path=)
   ActiveSupport::TestCase.fixtures :all
 end
 
-require_relative './mock_environment_test_case'
+require_relative 'mock_environment_test_case'
