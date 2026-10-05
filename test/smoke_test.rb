@@ -56,18 +56,20 @@ class SmokeTest < MockEnvironmentTestCase
     webp: 'RIFF',
     avif: "\x00\x00\x00\x1cftypavif".b,
     heic: "\x00\x00\x00\x1cftypheic".b,
-    jxl: "\xff\x0a".b
-    # jp2: Special case
+    # jp2, jxl: Special cases
   }.with_indifferent_access.freeze
 
   def check_magic_numbers
-    (formats - ['jp2']).each do |format|
+    (formats - %w[jp2 jxl]).each do |format|
       magic = MAGIC.fetch(format)
       assert_equal magic, build_path.join("test.#{format}").read(magic.bytesize),
                    "#{format} has the correct magic string"
     end
-    return unless formats.include?('jp2')
+    check_jp2_magic if formats.include?('jp2')
+    check_jxl_magic if formats.include?('jxl')
+  end
 
+  def check_jp2_magic
     actual = build_path.join('test.jp2').read(12)
     expected = "\0\0\0\x0cjP  \x0d\n\x87\n".b
     if actual[0] != "\0"
@@ -75,6 +77,13 @@ class SmokeTest < MockEnvironmentTestCase
       expected = "\xFFO\xFFQ".b
     end
     assert_equal expected, actual, 'jp2 has the correct magic string'
+  end
+
+  def check_jxl_magic
+    codestream = "\xff\x0a".b
+    container = "\x00\x00\x00\x0cJXL \x0d\x0a\x87\x0a".b
+    actual = build_path.join('test.jxl').read(container.bytesize)
+    assert [codestream, container].any? { actual.start_with?(_1) }, 'jxl has the correct magic string'
   end
 
   def setup_processor(processor)
