@@ -46,13 +46,20 @@ module DerivedImages
 
     def generate(entry, cache_key)
       target_path = entry.target_path
-      time = Benchmark.realtime do
+      elapsed = measure do
         tempfile = entry.pipeline.call(entry.source_path.to_s)
         File.chmod(0o644, tempfile.path)
         FileUtils.mv(tempfile.path, target_path)
       end
       cache.store(cache_key, target_path)
-      DerivedImages.config.logger.info("Created #{entry.target} from #{entry.source} in #{time.round(3)}s")
+      DerivedImages.config.logger.info("Created #{entry.target} from #{entry.source} in #{elapsed.round(3)}s")
+    end
+
+    # Returns the number of seconds the block took to run.
+    def measure
+      started_at = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+      yield
+      Process.clock_gettime(Process::CLOCK_MONOTONIC) - started_at
     end
   end
 end
