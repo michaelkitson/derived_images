@@ -5,7 +5,7 @@
 # JOBS (default 1) is how many pairs run at once. With JOBS=1 output streams live; with more, each
 # pair's output is buffered and the logs of failures are printed at the end.
 set -uo pipefail
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/.." || exit 1
 
 pairs=(
   "2.7|~> 7.0.0"
@@ -25,37 +25,38 @@ if ! [[ "$jobs" =~ ^[1-9][0-9]*$ ]]; then
   exit 1
 fi
 
-workdir="$(mktemp -d)"
-trap 'rm -rf "$workdir"' EXIT
-
-# Runs one pair; writes "<label>" to $workdir/<n>.failed on failure.
+# Runs one pair, given as "<n>|<ruby>|<rails>" followed by test args; writes its label to
+# $workdir/<n>.failed on failure. Invoked by xargs via --run-pair below.
 run_pair() {
-  local n="$1" ruby="$2" rails="$3" label="Ruby $2 / Rails ${3:-latest}"
-  shift 3
+  IFS='|' read -r n ruby rails <<< "$1"
+  shift
+  local label="Ruby $ruby / Rails ${rails:-latest}"
   if ((jobs == 1)); then
     echo "=== $label ==="
     RUBY_VERSION=$ruby RAILS_VERSION=$rails bin/in-docker test "$@" || echo "$label" > "$workdir/$n.failed"
+  elif RUBY_VERSION=$ruby RAILS_VERSION=$rails bin/in-docker test "$@" > "$workdir/$n.log" 2>&1; then
+    echo "PASS: $label"
   else
-    if RUBY_VERSION=$ruby RAILS_VERSION=$rails bin/in-docker test "$@" > "$workdir/$n.log" 2>&1; then
-      echo "PASS: $label"
-    else
-      echo "FAIL: $label"
-      echo "$label" > "$workdir/$n.failed"
-    fi
+    echo "FAIL: $label"
+    echo "$label" > "$workdir/$n.failed"
   fi
 }
+
+if [[ "${1:-}" == "--run-pair" ]]; then
+  shift
+  run_pair "$@"
+  exit 0
+fi
+
+workdir="$(mktemp -d)"
+trap 'rm -rf "$workdir"' EXIT
+export jobs workdir
 
 n=0
 for pair in "${pairs[@]}"; do
   n=$((n + 1))
-  while (($(jobs -rp | wc -l) >= jobs)); do sleep 1; done
-  if ((jobs == 1)); then
-    run_pair "$n" "${pair%%|*}" "${pair#*|}" "$@"
-  else
-    run_pair "$n" "${pair%%|*}" "${pair#*|}" "$@" &
-  fi
-done
-wait
+  echo "$n|$pair"
+done | xargs -P "$jobs" -I{} "$0" --run-pair {} "$@"
 
 failed=()
 for n in $(seq 1 ${#pairs[@]}); do
