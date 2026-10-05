@@ -2,7 +2,13 @@
 ARG RUBY_VERSION=4.0
 FROM ruby:${RUBY_VERSION}-slim
 
-RUN apt-get update -qq && \
+RUN . /etc/os-release && \
+    # Rubies old enough to be on EOL Debian (bullseye and earlier) have lost their mirror packages.
+    if [ "$VERSION_CODENAME" = bullseye ] || [ "$VERSION_CODENAME" = buster ]; then \
+      sed -i -e 's|deb.debian.org|archive.debian.org|' -e '/-updates/d' /etc/apt/sources.list; \
+      echo 'Acquire::Check-Valid-Until "false";' > /etc/apt/apt.conf.d/99archive; \
+    fi && \
+    apt-get update -qq && \
     apt-get install -yqq --no-install-recommends \
       build-essential git libyaml-dev pkg-config \
       libvips-tools imagemagick libheif1 libopenjp2-7 && \

@@ -54,16 +54,18 @@ class SmokeTest < MockEnvironmentTestCase
     jpg: "\xff\xd8\xff".b,
     png: "\x89PNG".b,
     webp: 'RIFF',
-    avif: "\x00\x00\x00\x1cftypavif".b,
-    heic: "\x00\x00\x00\x1cftypheic".b
+    avif: 'ftypavif',
+    heic: 'ftypheic'
     # jp2, jxl: Special cases
   }.with_indifferent_access.freeze
 
   def check_magic_numbers
     (formats - %w[jp2 jxl]).each do |format|
       magic = MAGIC.fetch(format)
-      assert_equal magic, build_path.join("test.#{format}").read(magic.bytesize),
-                   "#{format} has the correct magic string"
+      # ISO-BMFF files start with a box size, which varies with the encoder's brand list.
+      offset = magic.start_with?('ftyp') ? 4 : 0
+      actual = build_path.join("test.#{format}").read(offset + magic.bytesize).byteslice(offset..)
+      assert_equal magic, actual, "#{format} has the correct magic string"
     end
     check_jp2_magic if formats.include?('jp2')
     check_jxl_magic if formats.include?('jxl')
