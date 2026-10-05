@@ -4,10 +4,11 @@
 #   bin/in-docker test test/smoke_test.rb
 #   bin/in-docker vips_info
 #   RUBY_VERSION=2.7 bin/in-docker test
+#   RUBY_VERSION=3.2 RAILS_VERSION='~> 7.0.0' bin/in-docker test
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-unsupported=(in-docker release)
+unsupported=(in-docker release test-matrix)
 
 available=()
 for path in bin/*; do
@@ -24,9 +25,12 @@ fi
 shift
 
 ruby_version="${RUBY_VERSION:-4.0}"
-image="derived_images:${ruby_version}"
+rails_version="${RAILS_VERSION:-}"
+# Tag by Ruby and Rails so each combination keeps its own cached image ("~> 7.0.0" becomes "7.0.0").
+image="derived_images:${ruby_version}-rails$(echo "${rails_version:-latest}" | tr -cd 'A-Za-z0-9.')"
 
-docker build --quiet --build-arg "RUBY_VERSION=${ruby_version}" --tag "$image" . > /dev/null
+docker build --quiet --build-arg "RUBY_VERSION=${ruby_version}" --build-arg "RAILS_VERSION=${rails_version}" \
+  --tag "$image" . > /dev/null
 
 tty=()
 [[ -t 0 && -t 1 ]] && tty=(-it)

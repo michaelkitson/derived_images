@@ -22,6 +22,9 @@ WORKDIR /app
 
 # Gemfile.lock is deliberately not copied (see .dockerignore): it is resolved for
 # the host's Ruby and may not install on other Rubies.
+# Kept as an ENV so the Gemfile resolves identically at build time and when running the tests.
+ARG RAILS_VERSION=
+ENV RAILS_VERSION=${RAILS_VERSION}
 COPY Gemfile derived_images.gemspec ./
 COPY lib/derived_images/version.rb lib/derived_images/version.rb
 RUN bundle install

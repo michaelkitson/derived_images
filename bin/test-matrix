@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+# Runs the test suite in Docker against supported Ruby/Rails pairs: bin/test-matrix [test args]
+# Not a full cross product: Rails only supports a window of Rubies, so this lists the pairs worth running.
+# An empty Rails version means the newest Rails that installs on that Ruby.
+set -uo pipefail
+cd "$(dirname "$0")/.."
+
+pairs=(
+  "2.7|~> 7.0.0"
+  "2.7|~> 7.1.0"
+  "3.0|~> 7.1.0"
+  "3.1|~> 7.2.0"
+  "3.2|~> 7.0.0"
+  "3.2|"
+  "3.3|~> 7.2.0"
+  "3.3|~> 8.0.0"
+  "3.4|"
+  "4.0|"
+)
+failed=()
+
+for pair in "${pairs[@]}"; do
+  ruby="${pair%%|*}"
+  rails="${pair#*|}"
+  label="Ruby $ruby / Rails ${rails:-latest}"
+  echo "=== $label ==="
+  RUBY_VERSION=$ruby RAILS_VERSION=$rails bin/in-docker test "$@" || failed+=("$label")
+done
+
+if ((${#failed[@]})); then
+  printf 'FAILED: %s\n' "${failed[@]}" >&2
+  exit 1
+fi
+echo "All combinations passed"

@@ -24,5 +24,5 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'image_processing', '~> 1.0'
   spec.add_dependency 'listen', '~> 3.0'
-  spec.add_dependency 'railties', '>= 6.1'
+  spec.add_dependency 'railties', '>= 7.0'
 end

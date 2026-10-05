@@ -4,7 +4,7 @@ PATH
     derived_images (0.4.1)
       image_processing (~> 1.0)
       listen (~> 3.0)
-      railties (>= 6.1)
+      railties (>= 7.0)
 
 GEM
   remote: https://rubygems.org/
@@ -265,9 +265,9 @@ PLATFORMS
 
 DEPENDENCIES
   derived_images!
-  rails (>= 6.1)
+  rails (>= 7.0)
   rubocop (~> 1.51)
   rubocop-performance (~> 1.17)
 
 BUNDLED WITH
-  4.0.20
+  4.0.16
