@@ -22,11 +22,10 @@ class ProcessorTest < MockEnvironmentTestCase
   def wait_until(timeout: 5)
     deadline = Process.clock_gettime(Process::CLOCK_MONOTONIC) + timeout
     until yield
-      return false if Process.clock_gettime(Process::CLOCK_MONOTONIC) > deadline
+      return if Process.clock_gettime(Process::CLOCK_MONOTONIC) > deadline
 
       sleep 0.01
     end
-    true
   end
 
   test '#run_once' do
