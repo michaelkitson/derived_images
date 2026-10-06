@@ -14,7 +14,7 @@ jobs:
         if: ${{ startsWith(matrix.os, 'ubuntu-') }}
         run: |
           sudo apt update -qq
-          sudo apt install -yqq libvips-dev imagemagick
+          sudo apt install -yqq libvips-dev imagemagick libheif-plugin-aomenc libheif-plugin-x265
 
       - name: Install Vips and Imagemagick (macos)
         if: ${{ startsWith(matrix.os, 'macos-') }}
