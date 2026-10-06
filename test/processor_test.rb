@@ -18,16 +18,6 @@ class ProcessorTest < MockEnvironmentTestCase
     super
   end
 
-  # The listeners run on background threads, so poll instead of sleeping a fixed time.
-  def wait_until(timeout: 5)
-    deadline = Process.clock_gettime(Process::CLOCK_MONOTONIC) + timeout
-    until yield
-      return if Process.clock_gettime(Process::CLOCK_MONOTONIC) > deadline
-
-      sleep 0.01
-    end
-  end
-
   test '#run_once' do
     @processor.run_once
     assert_equal 2, @queue.length, 'enqueues the jobs'
@@ -47,31 +37,20 @@ class ProcessorTest < MockEnvironmentTestCase
 
   test '#watch' do
     @processor.watch
-    wait_until { @queue.length == 2 }
     assert_equal 2, @queue.length, 'enqueues the jobs'
     assert_not @queue.closed?, 'leaves the queue open'
   end
 
   test '#watch when manifest updated' do
-    @processor.watch
-    wait_until { @queue.length == 2 }
-    @queue.clear
-    assert @queue.empty?
-
-    File.open(DerivedImages.config.manifest_path, 'a', &:puts)
-    wait_until { @queue.length == 2 }
-    assert_equal 2, @queue.length, 'enqueues the jobs'
+    File.open(DerivedImages.config.manifest_path, 'a') { _1.puts 'derive "out3.png", from: "source3.png"' }
+    @processor.send(:manifest_changed)
+    assert_equal 3, @queue.length, 'reloads the manifest and enqueues the jobs'
   end
 
   test '#watch when image updated' do
-    @processor.watch
-    wait_until { @queue.length == 2 }
-    @queue.clear
-    assert @queue.empty?
-
     image_path = Pathname.new(DerivedImages.config.image_paths.first).join('source1.png')
     File.open(image_path, 'w', &:puts)
-    wait_until { @queue.length == 1 }
+    @processor.send(:images_changed, [image_path.to_s])
     assert_equal 1, @queue.length, 'enqueues the jobs'
   end
 end

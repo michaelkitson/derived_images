@@ -34,23 +34,29 @@ module DerivedImages
 
     def watch_manifest
       dir, file = manifest.path.split.map(&:to_s)
-      @manifest_listener = Listen.to(dir, only: Regexp.new(file)) do
-        DerivedImages.config.logger.debug('Reloading changed manifest')
-        @manifest = Manifest.new.tap(&:draw)
-        process_all
-      end
+      @manifest_listener = Listen.to(dir, only: Regexp.new(file)) { manifest_changed }
       manifest_listener.start
     end
 
     def watch_images
       @image_listener = Listen.to(*DerivedImages.config.image_paths) do |modified, added, removed|
-        (modified + added + removed).each do |path|
-          source_path = Pathname.new(path).expand_path.realpath
-          manifest.produced_from(source_path).each { enqueue(_1) }
-        end
-        prune_cache
+        images_changed(modified + added + removed)
       end
       image_listener.start
+    end
+
+    def manifest_changed
+      DerivedImages.config.logger.debug('Reloading changed manifest')
+      @manifest = Manifest.new.tap(&:draw)
+      process_all
+    end
+
+    def images_changed(paths)
+      paths.each do |path|
+        source_path = Pathname.new(path).expand_path.realpath
+        manifest.produced_from(source_path).each { enqueue(_1) }
+      end
+      prune_cache
     end
 
     def process_all
