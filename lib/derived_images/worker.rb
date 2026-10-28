@@ -29,6 +29,7 @@ module DerivedImages
         return DerivedImages.config.logger.error("Can't find #{entry.source} to build #{entry.target}")
       end
 
+      FileUtils.mkdir_p(entry.target_path.dirname)
       cache_key = entry.cache_key
       if cache.exist?(cache_key)
         restore(entry, cache_key)
