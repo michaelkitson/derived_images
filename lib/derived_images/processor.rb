@@ -36,8 +36,11 @@ module DerivedImages
     attr_reader :cache, :failures, :image_listener, :manifest, :manifest_listener, :queue, :workers
 
     def watch_manifest
-      dir, file = manifest.path.split.map(&:to_s)
-      @manifest_listener = Listen.to(dir, only: Regexp.new(file)) { manifest_changed }
+      # Listen can only watch whole directories (recursively), so ignore changes to anything but the manifest itself.
+      manifest_path = resolve_path(manifest.path)
+      @manifest_listener = Listen.to(manifest.path.dirname) do |modified, added, removed|
+        manifest_changed if (modified + added + removed).any? { resolve_path(_1) == manifest_path }
+      end
       manifest_listener.start
     end
 
