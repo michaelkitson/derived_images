@@ -8,7 +8,7 @@ namespace :derived_images do
   end
 
   desc 'build assets from derived_images once'
-  task :build do
+  task build: :environment do
     DerivedImages::Processor.new.run_once
   end
 end
