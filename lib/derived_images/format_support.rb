@@ -40,12 +40,17 @@ module DerivedImages
 
     attr_reader :processor
 
+    # The processor gems are loaded on demand, since apps only install the one they use.
     def vips
-      @vips ||= Vips.get_suffixes.map { _1.delete('.') }
+      @vips ||= begin
+        require 'image_processing/vips'
+        Vips.get_suffixes.map { _1.delete('.') }
+      end
     end
 
     def magick
       @magick ||= begin
+        require 'image_processing/mini_magick'
         output, = MiniMagick::Shell.new.execute(%w[identify -list format])
         lines = output.partition("\n\n").first.lines[2..]
         lines.reject { _1.start_with?(' ' * 10) } # Remove continuation lines

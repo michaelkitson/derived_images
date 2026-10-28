@@ -11,7 +11,10 @@ Resize images, lower quality to save bytes, rotate, crop, convert between format
 
 1. Run `./bin/bundle add derived_images`
 2. Run `./bin/rails derived_images:install`
-3. Install Vips or ImageMagick (if not already installed for ActiveStorage/ImageProcessing)
+3. Add the gem for your image processor, if it isn't already in your Gemfile for ActiveStorage/ImageProcessing
+    - Vips (the default): `./bin/bundle add ruby-vips`
+    - ImageMagick: `./bin/bundle add mini_magick`, and set `config.derived_images.processor = :mini_magick`
+4. Install Vips or ImageMagick (if not already installed for ActiveStorage/ImageProcessing)
     - MacOS: `brew install vips` or `brew install imagemagick`
     - Debian/Ubuntu: `apt install libvips42` or `apt install imagemagick`
 

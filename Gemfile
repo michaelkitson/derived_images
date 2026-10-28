@@ -10,6 +10,10 @@ gem 'rails', rails_version.empty? ? '>= 7.0' : rails_version
 gem 'rubocop', '~> 1.51'
 gem 'rubocop-performance', '~> 1.17'
 
+# Apps pick one processor gem; install both so the tests cover each.
+gem 'mini_magick', '>= 4.9.5', '< 6'
+gem 'ruby-vips', '>= 2.0.17', '< 3'
+
 # Rails 7.0, 7.1 and 8.0 (and all that Rubies before 3.1 can install) pass JSON.generate options that json 3 removed.
 gem 'json', '< 3' if RUBY_VERSION < '3.1' || rails_version.match?(/\b(7\.[01]|8\.0)/)
 

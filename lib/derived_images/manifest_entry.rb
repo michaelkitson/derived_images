@@ -40,10 +40,11 @@ module DerivedImages
     end
 
     def self.empty_pipeline
-      PROCESSORS.fetch(DerivedImages.config.processor).dup
+      ImageProcessing.const_get(PROCESSORS.fetch(DerivedImages.config.processor)).dup
     end
 
-    PROCESSORS = { mini_magick: ImageProcessing::MiniMagick, vips: ImageProcessing::Vips }.freeze
+    # Constant names rather than the modules, so only the configured processor's gem gets loaded.
+    PROCESSORS = { mini_magick: :MiniMagick, vips: :Vips }.freeze
     COMPRESSION_OVERRIDES = { 'avif' => 'av1', 'heic' => 'hevc' }.freeze
 
     def target_digest
@@ -61,9 +62,9 @@ module DerivedImages
     end
 
     def default_pipeline(target_ext)
-      pipeline = PROCESSORS.fetch(DerivedImages.config.processor).dup
+      pipeline = self.class.empty_pipeline
       pipeline = pipeline.convert(target_ext) if target_ext.present?
-      vips = pipeline.options[:processor] == ImageProcessing::Vips::Processor
+      vips = DerivedImages.config.processor == :vips
       if vips && !Vips.at_least_libvips?(8, 12) && COMPRESSION_OVERRIDES.key?(target_ext)
         # https://github.com/libvips/libvips/commit/47383b5bfc136f7870c319a1edce4848e177425b
         pipeline = pipeline.saver(compression: COMPRESSION_OVERRIDES.fetch(target_ext))

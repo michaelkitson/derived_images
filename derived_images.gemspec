@@ -24,7 +24,5 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'image_processing', '>= 1', '< 3'
   spec.add_dependency 'listen', '~> 3.0'
-  spec.add_dependency 'mini_magick', '>= 4.9.5', '< 6'
   spec.add_dependency 'railties', '>= 7.0'
-  spec.add_dependency 'ruby-vips', '>= 2.0.17', '< 3'
 end
