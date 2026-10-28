@@ -50,8 +50,20 @@ module DerivedImages
 
     def manifest_changed
       DerivedImages.config.logger.debug('Reloading changed manifest')
+      former_manifest = manifest
       @manifest = Manifest.new.tap(&:draw)
+      _added, _changed, removed = manifest.diff_from(former_manifest)
+      remove_targets(removed)
       process_all
+    end
+
+    def remove_targets(entries)
+      entries.each do |entry|
+        next unless entry.target_path.file?
+
+        entry.target_path.delete
+        DerivedImages.config.logger.info("Removed #{entry.target}")
+      end
     end
 
     def images_changed(paths)

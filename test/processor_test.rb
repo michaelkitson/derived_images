@@ -57,6 +57,17 @@ class ProcessorTest < MockEnvironmentTestCase
     assert_equal 3, @queue.length, 'reloads the manifest and enqueues the jobs'
   end
 
+  test '#watch when target removed from manifest' do
+    build_path = Pathname.new(DerivedImages.config.build_path)
+    build_path.join('out1.png').write('')
+    build_path.join('unrelated.css').write('')
+    File.write(DerivedImages.config.manifest_path, 'derive "out2.png", from: "source2.png"')
+    @processor.send(:manifest_changed)
+    assert_not build_path.join('out1.png').exist?, 'removes the stale target'
+    assert build_path.join('unrelated.css').exist?, 'leaves other files alone'
+    assert_equal ['out2.png'], queued_targets
+  end
+
   test '#watch when image updated' do
     image_path = Pathname.new(DerivedImages.config.image_paths.first).join('source1.png')
     File.open(image_path, 'w', &:puts)

@@ -42,7 +42,7 @@ module DerivedImages
       removed = []
       former_manifest.each do |target, entry|
         if key?(target)
-          changed << entry if entry_map[target] != entry
+          changed << entry_map[target] if entry_map[target] != entry
         else
           removed << entry
         end

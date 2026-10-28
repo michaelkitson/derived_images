@@ -47,7 +47,7 @@ class ManifestTest < MockEnvironmentTestCase
 
     added, changed, removed = new_manifest.diff_from(manifest)
     assert_equal '3.png', added.sole.target
-    assert_equal 'a.png', changed.sole.target
+    assert_same new_manifest['a.png'], changed.sole, 'returns the new entry for changed targets'
     assert_equal '1.png', removed.sole.target
   end
 end
