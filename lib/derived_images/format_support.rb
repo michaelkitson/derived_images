@@ -51,13 +51,16 @@ module DerivedImages
     def magick
       @magick ||= begin
         require 'image_processing/mini_magick'
-        output = MiniMagick::Tool.new('identify') { _1 << '-list' << 'format' }
-        lines = output.partition("\n\n").first.lines[2..]
-        lines.reject { _1.start_with?(' ' * 10) } # Remove continuation lines
-             .map { _1.strip.split(/\s+/, 4) } # split out fields ("Format Module Mode Description")
-             .select { |_format, _, mode, _| mode.start_with?('rw') } # Read and write supported
-             .map { _1.first.delete('*').downcase }
+        parse_magick_formats(MiniMagick::Tool.new('identify') { _1 << '-list' << 'format' })
       end
+    end
+
+    def parse_magick_formats(output)
+      lines = output.partition("\n\n").first.lines[2..]
+      lines.reject { _1.start_with?(' ' * 10) } # Remove continuation lines
+           .map { _1.strip.split(/\s+/, 4) } # split out fields ("Format Module Mode Description")
+           .select { |_format, _, mode, _| mode.start_with?('rw') } # Read and write supported
+           .map { _1.first.delete('*').downcase }
     end
   end
 end
