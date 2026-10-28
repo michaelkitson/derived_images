@@ -91,7 +91,8 @@ module DerivedImages
     end
 
     def enqueue(entry)
-      should_expand = queue.num_waiting.zero? && workers.list.length < DerivedImages.config.threads
+      # Waiting workers stay counted until they wake and pop, so compare them against the backlog rather than zero.
+      should_expand = queue.length >= queue.num_waiting && workers.list.length < DerivedImages.config.threads
       queue << entry
       Worker.start(workers, queue, failures: failures) if should_expand
     end
