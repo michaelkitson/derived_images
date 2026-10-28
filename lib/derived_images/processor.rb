@@ -22,15 +22,18 @@ module DerivedImages
       image_listener&.stop
     end
 
+    # Builds every image in the manifest, then raises {BuildError} if any of them failed.
     def run_once
+      @failures = Thread::Queue.new
       process_all
       queue.close
       @workers.list.each(&:join)
+      raise_failures
     end
 
     private
 
-    attr_reader :cache, :image_listener, :manifest, :manifest_listener, :queue, :workers
+    attr_reader :cache, :failures, :image_listener, :manifest, :manifest_listener, :queue, :workers
 
     def watch_manifest
       dir, file = manifest.path.split.map(&:to_s)
@@ -75,7 +78,12 @@ module DerivedImages
     def enqueue(entry)
       should_expand = queue.num_waiting.zero? && workers.list.length < DerivedImages.config.threads
       queue << entry
-      Worker.start(workers, queue) if should_expand
+      Worker.start(workers, queue, failures: failures) if should_expand
+    end
+
+    def raise_failures
+      targets = Array.new(failures.length) { failures.pop.target }
+      raise BuildError, "Failed to build #{targets.sort.join(', ')}" if targets.any?
     end
 
     def prune_cache

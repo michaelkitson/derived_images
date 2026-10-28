@@ -16,6 +16,9 @@ require 'derived_images/version'
 
 # DerivedImages programmatically creates derived image assets by applying transformations to other assets.
 module DerivedImages
+  # Raised by {Processor#run_once} when one or more images couldn't be built.
+  class BuildError < StandardError; end
+
   def self.config
     Rails.application.config.derived_images
   end

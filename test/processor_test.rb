@@ -35,6 +35,16 @@ class ProcessorTest < MockEnvironmentTestCase
     assert_not cache.exist?(cache_key)
   end
 
+  test '#run_once builds the remaining images then raises when one fails' do
+    DerivedImages.config.threads = 2
+    image_path = Pathname.new(DerivedImages.config.image_paths.first)
+    FileUtils.cp('test/fixtures/files/sample.jpg', image_path.join('source1.png'))
+    image_path.join('source2.png').write('not an image')
+    error = assert_raises(DerivedImages::BuildError) { @processor.run_once }
+    assert_equal 'Failed to build out2.png', error.message
+    assert_predicate Pathname.new(DerivedImages.config.build_path).join('out1.png'), :file?
+  end
+
   test '#watch' do
     @processor.watch
     assert_equal 2, @queue.length, 'enqueues the jobs'

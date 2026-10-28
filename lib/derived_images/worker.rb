@@ -3,26 +3,38 @@
 module DerivedImages
   # A Worker represents a thread in a thread pool that completes image creation tasks.
   class Worker
-    def initialize(queue, cache = Cache.new)
+    # @param [Thread::Queue, nil] failures Entries that raise an error while processing are pushed here, if given.
+    def initialize(queue, cache = Cache.new, failures: nil)
       @queue = queue
       @cache = cache
+      @failures = failures
     end
 
     def run
       until queue.closed? && queue.empty?
         entry = queue.pop
-        process(entry) if entry
+        process_safely(entry) if entry
       end
     end
 
-    def self.start(thread_group, queue)
+    def self.start(thread_group, queue, failures: nil)
       DerivedImages.config.logger.debug('Starting a new worker thread')
-      thread_group.add(Thread.new { Worker.new(queue).run })
+      thread_group.add(Thread.new { Worker.new(queue, failures: failures).run })
     end
 
     private
 
-    attr_reader :cache, :queue
+    attr_reader :cache, :failures, :queue
+
+    # Logs an error instead of letting it end the thread, so one bad image doesn't stop the rest from being built.
+    def process_safely(entry)
+      process(entry)
+    rescue StandardError => e
+      logger = DerivedImages.config.logger
+      logger.error("Failed to build #{entry.target} from #{entry.source}: #{e.class}: #{e.message}")
+      logger.debug(e.full_message(highlight: false))
+      failures&.push(entry)
+    end
 
     def process(entry)
       unless entry.source_present?
