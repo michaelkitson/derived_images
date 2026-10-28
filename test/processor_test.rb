@@ -51,6 +51,27 @@ class ProcessorTest < MockEnvironmentTestCase
     image_path = Pathname.new(DerivedImages.config.image_paths.first).join('source1.png')
     File.open(image_path, 'w', &:puts)
     @processor.send(:images_changed, [image_path.to_s])
-    assert_equal 1, @queue.length, 'enqueues the jobs'
+    assert_equal ['out1.png'], queued_targets
+  end
+
+  test '#watch when image removed' do
+    image_path = Pathname.new(DerivedImages.config.image_paths.first).join('source1.png')
+    @processor.send(:images_changed, [image_path.to_s])
+    assert_equal ['out1.png'], queued_targets
+  end
+
+  test '#watch when directory containing image removed' do
+    File.open(DerivedImages.config.manifest_path, 'a') { _1.puts 'derive "out3.png", from: "removed/source3.png"' }
+    @processor = DerivedImages::Processor.new
+    @queue = @processor.send(:queue)
+    image_path = Pathname.new(DerivedImages.config.image_paths.first).join('removed', 'source3.png')
+    @processor.send(:images_changed, [image_path.to_s])
+    assert_equal ['out3.png'], queued_targets
+  end
+
+  private
+
+  def queued_targets
+    Array.new(@queue.length) { @queue.pop(true).target }
   end
 end

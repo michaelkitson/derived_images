@@ -53,10 +53,18 @@ module DerivedImages
 
     def images_changed(paths)
       paths.each do |path|
-        source_path = Pathname.new(path).expand_path.realpath
-        manifest.produced_from(source_path).each { enqueue(_1) }
+        manifest.produced_from(resolve_path(path)).each { enqueue(_1) }
       end
       prune_cache
+    end
+
+    # Resolves symlinks like `realpath`, but also works for paths that have been removed, by resolving the nearest
+    # ancestor that still exists.
+    def resolve_path(path)
+      path = Pathname.new(path).expand_path
+      path.realdirpath
+    rescue Errno::ENOENT
+      resolve_path(path.dirname).join(path.basename)
     end
 
     def process_all
