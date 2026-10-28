@@ -51,7 +51,7 @@ module DerivedImages
     def magick
       @magick ||= begin
         require 'image_processing/mini_magick'
-        output, = MiniMagick::Shell.new.execute(%w[identify -list format])
+        output = MiniMagick::Tool.new('identify') { _1 << '-list' << 'format' }
         lines = output.partition("\n\n").first.lines[2..]
         lines.reject { _1.start_with?(' ' * 10) } # Remove continuation lines
              .map { _1.strip.split(/\s+/, 4) } # split out fields ("Format Module Mode Description")
