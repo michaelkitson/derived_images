@@ -50,7 +50,7 @@ Set options on `config.derived_images` in `config/application.rb` or an environm
 | `image_paths`   | `['app/assets/images']`                                  | Directories to look in for source images                       |
 | `manifest_path` | `'config/derived_images.rb'`                             | The file listing the images to derive                          |
 | `processor`     | `:vips`                                                  | `:vips` or `:mini_magick`                                      |
-| `threads`       | `5`                                                      | Maximum number of worker threads                               |
+| `threads`       | Number of processors (`Etc.nprocessors`)                 | Maximum number of worker threads                               |
 
 `rails derived_images:build` builds all images once regardless of `enabled`, and runs automatically before
 `assets:precompile`.

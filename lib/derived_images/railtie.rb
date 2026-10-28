@@ -10,7 +10,7 @@ module DerivedImages
       image_paths: ['app/assets/images'],
       manifest_path: 'config/derived_images.rb',
       processor: :vips,
-      threads: 5,
+      threads: Etc.nprocessors,
       watch: Rails.env.development?
     )
 

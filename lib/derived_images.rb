@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'etc'
 require 'image_processing'
 require 'listen'
 require 'rails'
