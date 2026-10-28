@@ -48,6 +48,32 @@ class CacheTest < MockEnvironmentTestCase
     assert_equal 'test content', target_path.read
   end
 
+  test '#copy replaces an existing file without leaving temporary files' do
+    target_path = dir.join('sample')
+    target_path.write('old content')
+    dir.join('so').mkdir
+    dir.join('so/mekey').write('new content')
+    cache.copy('somekey', target_path)
+    assert_equal 'new content', target_path.read
+    assert_equal %w[sample so so/mekey], dir_entries
+  end
+
+  test '#store does not leave temporary files' do
+    source_path = dir.join('sample')
+    source_path.write('test content')
+    cache.store('somekey', source_path)
+    assert_equal %w[sample so so/mekey], dir_entries
+  end
+
+  test '#store removes its temporary file if it fails' do
+    source_path = dir.join('sample')
+    source_path.write('test content')
+    dir.join('so/mekey').mkpath
+    dir.join('so/mekey/blocker').write('')
+    assert_raises(SystemCallError) { cache.store('somekey', source_path) }
+    assert_equal %w[sample so so/mekey so/mekey/blocker], dir_entries
+  end
+
   test '#take_and_store' do
     source_path = dir.join('sample')
     source_path.write('test content')
@@ -85,5 +111,10 @@ class CacheTest < MockEnvironmentTestCase
 
   def dir
     Pathname.new(DerivedImages.config.cache_path)
+  end
+
+  # All paths under the cache directory, including dotfiles.
+  def dir_entries
+    dir.glob('**/*', File::FNM_DOTMATCH).map { _1.relative_path_from(dir).to_s }.reject { _1 == '.' }.sort
   end
 end

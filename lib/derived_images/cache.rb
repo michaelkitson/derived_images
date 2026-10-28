@@ -15,7 +15,7 @@ module DerivedImages
     # @param [String] key Cache key
     # @param [Pathname, String] path
     def copy(key, path)
-      enabled? && FileUtils.copy(key_path(key), path)
+      enabled? && atomic_copy(key_path(key), path)
     end
 
     # Check for the presence of a cached file.
@@ -44,7 +44,7 @@ module DerivedImages
       return unless enabled?
 
       mkdir_for(key)
-      FileUtils.copy(path, key_path(key))
+      atomic_copy(path, key_path(key))
     end
 
     # Move (not copy) a file into the cache.
@@ -106,6 +106,20 @@ module DerivedImages
 
     def enabled?
       !@path.nil?
+    end
+
+    # Copy a file via a temporary file in the destination directory, then rename it into place.
+    #
+    # @param [Pathname, String] source
+    # @param [Pathname, String] destination
+    def atomic_copy(source, destination)
+      destination = Pathname.new(destination)
+      temp_path = destination.dirname.join(".#{destination.basename}.#{SecureRandom.hex(8)}.tmp")
+      FileUtils.copy(source, temp_path)
+      File.rename(temp_path, destination)
+    rescue Exception # rubocop:disable Lint/RescueException
+      FileUtils.rm_f(temp_path) if temp_path
+      raise
     end
   end
 end
