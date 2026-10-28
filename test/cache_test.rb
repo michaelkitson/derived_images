@@ -115,6 +115,6 @@ class CacheTest < MockEnvironmentTestCase
 
   # All paths under the cache directory, including dotfiles.
   def dir_entries
-    dir.glob('**/*', File::FNM_DOTMATCH).map { _1.relative_path_from(dir).to_s }.reject { _1 == '.' }.sort
+    Dir.glob('**/*', File::FNM_DOTMATCH, base: dir).reject { File.basename(_1) == '.' }.sort
   end
 end
