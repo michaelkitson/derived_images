@@ -13,4 +13,4 @@ namespace :derived_images do
   end
 end
 
-Rake::Task['assets:precompile'].enhance(['derived_images:build']) if Rake::Task.task_defined?('assets:precompile')
+task 'assets:precompile' => 'derived_images:build'
