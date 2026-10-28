@@ -13,13 +13,13 @@ class MockEnvironmentTestCase < ActiveSupport::TestCase
     DerivedImages.config.update(
       build_path: build_dir,
       cache_path: cache_dir,
-      enabled?: true,
+      enabled: true,
       image_paths: [image_path],
       # logger: Logger.new($stdout),
       manifest_path: File.join(config_dir, 'derived_images.rb'),
       processor: :vips,
       threads: 0,
-      watch?: false
+      watch: false
     )
     super
     # Listen.logger = DerivedImages.config.logger

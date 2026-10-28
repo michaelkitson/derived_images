@@ -37,6 +37,24 @@ pipeline can pick them up with the normal asset helpers.
 <%= image_tag('tiny.png') %>
 ```
 
+## Configuration
+
+Set options on `config.derived_images` in `config/application.rb` or an environment file.
+
+| Option          | Default                                                  | Description                                                    |
+|-----------------|----------------------------------------------------------|----------------------------------------------------------------|
+| `enabled`       | `true` in development and test                           | Build images when the Rails server starts                      |
+| `watch`         | `true` in development                                    | Keep watching for changes after the initial build              |
+| `build_path`    | `'app/assets/builds'`                                    | Where derived images are written                               |
+| `cache_path`    | `'tmp/cache/derived_images'` in development, else `nil`  | Where built images are cached; `nil` disables the cache        |
+| `image_paths`   | `['app/assets/images']`                                  | Directories to look in for source images                       |
+| `manifest_path` | `'config/derived_images.rb'`                             | The file listing the images to derive                          |
+| `processor`     | `:vips`                                                  | `:vips` or `:mini_magick`                                      |
+| `threads`       | `5`                                                      | Maximum number of worker threads                               |
+
+`rails derived_images:build` builds all images once regardless of `enabled`, and runs automatically before
+`assets:precompile`.
+
 ## License
 
 The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).

@@ -6,12 +6,12 @@ module DerivedImages
     config.derived_images = ActiveSupport::OrderedOptions.new.update(
       build_path: 'app/assets/builds',
       cache_path: Rails.env.development? ? 'tmp/cache/derived_images' : nil,
-      enabled?: Rails.env.development? || Rails.env.test?,
+      enabled: Rails.env.development? || Rails.env.test?,
       image_paths: ['app/assets/images'],
       manifest_path: 'config/derived_images.rb',
       processor: :vips,
       threads: 5,
-      watch?: Rails.env.development?
+      watch: Rails.env.development?
     )
 
     initializer 'derived_images' do |app|
@@ -25,10 +25,10 @@ module DerivedImages
 
     server do |app|
       derived_images = app.config.derived_images
-      next unless derived_images.enabled?
+      next unless derived_images.enabled
 
       processor = DerivedImages::Processor.new
-      if derived_images.watch?
+      if derived_images.watch
         processor.watch
       else
         processor.run_once
