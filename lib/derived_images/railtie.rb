@@ -5,7 +5,7 @@ module DerivedImages
   class Railtie < ::Rails::Railtie
     config.derived_images = ActiveSupport::OrderedOptions.new.update(
       build_path: 'app/assets/builds',
-      cache_path: Rails.env.development? ? 'tmp/cache/derived_images' : nil,
+      cache_path: Rails.env.development? || Rails.env.test? ? 'tmp/cache/derived_images' : nil,
       enabled: Rails.env.development? || Rails.env.test?,
       image_paths: ['app/assets/images'],
       manifest_path: 'config/derived_images.rb',
