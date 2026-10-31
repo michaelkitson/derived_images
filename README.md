@@ -9,6 +9,8 @@ Resize images, lower quality to save bytes, rotate, crop, convert between format
 
 ## Installation
 
+Rails ≥ 7.0, Ruby ≥ 2.7
+
 1. Run `./bin/bundle add derived_images`
 2. Run `./bin/rails derived_images:install`
 3. Add the gem for your image processor, if it isn't already in your Gemfile for ActiveStorage/ImageProcessing
@@ -24,17 +26,17 @@ After installing, specify images to create in the config file at `config/derived
 
 ```ruby
 derive 'my_derived_image.webp', from: 'my_source_image.jpg'
-resize 'tiny.png', from: 'original.png', width: 400, height: 300
+resize 'thumbnail.png', from: 'original.png', width: 400, height: 300
 derive 'fully_custom.jpg', from: 'original.jpg' do |pipeline|
   pipeline.saver(quality: 50).resize_to_fill(80, 80).rotate(180)
 end
 ```
 
-DerivedImages watches this file and the source images, compiling new assets into `app/assets/builds` where the asset
+In development, DerivedImages watches this file and the source images, compiling new assets into `app/assets/builds` where the asset
 pipeline can pick them up with the normal asset helpers.
 
-```erbruby
-<%= image_tag('tiny.png') %>
+```erb
+<%= image_tag('thumbnail.png') %>
 ```
 
 ## Configuration
